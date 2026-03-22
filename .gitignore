@@ -24,6 +24,5 @@ hivepulse-web/.env.*.local
 
 # Worktrees
 .worktrees/
-
-# OS
-.DS_Store
+CLAUDE.md
+docs/superpowers/
