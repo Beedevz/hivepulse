@@ -11,7 +11,7 @@ CREATE TABLE monitors (
     url              TEXT,
     method           VARCHAR(10),
     expected_status  INTEGER,
-    request_headers  JSONB,
+    request_headers  TEXT,
     request_body     TEXT,
     follow_redirects BOOLEAN NOT NULL DEFAULT true,
     host             TEXT,
