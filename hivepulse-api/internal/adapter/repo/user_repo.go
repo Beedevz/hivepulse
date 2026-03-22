@@ -69,7 +69,7 @@ func (r *UserRepo) List(ctx context.Context, page, limit int) ([]*domain.User, i
 	if err := r.db.WithContext(ctx).Model(&userModel{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
-	if err := r.db.WithContext(ctx).Offset(offset).Limit(limit).Order("created_at DESC").Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Offset(offset).Limit(limit).Order("created_at ASC").Find(&models).Error; err != nil {
 		return nil, 0, err
 	}
 	result := make([]*domain.User, len(models))
@@ -80,11 +80,25 @@ func (r *UserRepo) List(ctx context.Context, page, limit int) ([]*domain.User, i
 }
 
 func (r *UserRepo) UpdateRole(ctx context.Context, id string, role domain.Role) error {
-	return r.db.WithContext(ctx).Model(&userModel{}).Where("id = ?", id).Update("role", string(role)).Error
+	result := r.db.WithContext(ctx).Model(&userModel{}).Where("id = ?", id).Update("role", string(role))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
 
 func (r *UserRepo) Delete(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).Delete(&userModel{}, "id = ?", id).Error
+	result := r.db.WithContext(ctx).Delete(&userModel{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
 
 func toDomainUser(m *userModel) *domain.User {

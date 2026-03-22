@@ -82,11 +82,49 @@ func (r *MonitorRepo) FindAll(ctx context.Context, page, limit int) ([]*domain.M
 }
 
 func (r *MonitorRepo) Update(ctx context.Context, m *domain.Monitor) error {
-	return r.db.WithContext(ctx).Model(&monitorModel{}).Where("id = ?", m.ID).Updates(toMonitorModel(m)).Error
+	updates := map[string]any{
+		"user_id":          m.UserID,
+		"name":             m.Name,
+		"check_type":       string(m.CheckType),
+		"interval":         m.Interval,
+		"timeout":          m.Timeout,
+		"retries":          m.Retries,
+		"retry_interval":   m.RetryInterval,
+		"enabled":          m.Enabled,
+		"url":              m.URL,
+		"method":           m.Method,
+		"expected_status":  m.ExpectedStatus,
+		"request_headers":  m.RequestHeaders,
+		"request_body":     m.RequestBody,
+		"follow_redirects": m.FollowRedirects,
+		"host":             m.Host,
+		"port":             m.Port,
+		"ping_host":        m.PingHost,
+		"packet_count":     m.PacketCount,
+		"dns_host":         m.DNSHost,
+		"record_type":      m.RecordType,
+		"expected_value":   m.ExpectedValue,
+		"dns_server":       m.DNSServer,
+	}
+	result := r.db.WithContext(ctx).Model(&monitorModel{}).Where("id = ?", m.ID).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
 
 func (r *MonitorRepo) Delete(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).Delete(&monitorModel{}, "id = ?", id).Error
+	result := r.db.WithContext(ctx).Delete(&monitorModel{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
 
 func toMonitorModel(m *domain.Monitor) *monitorModel {
