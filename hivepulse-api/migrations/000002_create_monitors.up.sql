@@ -26,3 +26,4 @@ CREATE TABLE monitors (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_monitors_user_id ON monitors(user_id);
+CREATE INDEX idx_monitors_enabled ON monitors(enabled);
