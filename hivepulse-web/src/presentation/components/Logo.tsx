@@ -1,11 +1,11 @@
-import { useMemo } from 'react'
+import { useId } from 'react'
 import { useTheme } from '../../shared/useTheme'
 
 export const Logo = ({ size = 28 }: { size?: number }) => {
   const { name } = useTheme()
   const c1 = name === 'dark' ? '#f5a623' : '#d4900e'
   const c2 = name === 'dark' ? '#e8891c' : '#b87a0a'
-  const uid = useMemo(() => 'l' + Math.random().toString(36).slice(2, 5), [])
+  const uid = useId()
   return (
     <svg width={size} height={size} viewBox="0 0 100 100">
       <defs>
