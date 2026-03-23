@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -200,6 +201,10 @@ func (h *MonitorHandler) Update(c *gin.Context) {
 // @Router       /monitors/{id} [delete]
 func (h *MonitorHandler) Delete(c *gin.Context) {
 	if err := h.svc.DeleteMonitor(c.Request.Context(), c.Param("id")); err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 		return
 	}
