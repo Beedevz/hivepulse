@@ -29,7 +29,7 @@ func NewUserHandler(svc UserService) *UserHandler { return &UserHandler{svc: svc
 // @Param        page  query int false "Page number" default(1)
 // @Param        limit query int false "Items per page" default(20)
 // @Success      200 {object} map[string]interface{}
-// @Failure      403 {object} map[string]string
+// @Failure      500 {object} map[string]string
 // @Router       /users [get]
 func (h *UserHandler) ListUsers(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
