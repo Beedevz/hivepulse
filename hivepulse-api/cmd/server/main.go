@@ -16,6 +16,7 @@ import (
 	"github.com/beedevz/hivepulse/internal/adapter/handler"
 	"github.com/beedevz/hivepulse/internal/adapter/middleware"
 	"github.com/beedevz/hivepulse/internal/adapter/repo"
+	"github.com/beedevz/hivepulse/internal/domain"
 	"github.com/beedevz/hivepulse/internal/usecase"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -36,6 +37,13 @@ func main() {
 	)
 	authHandler := handler.NewAuthHandler(authUC, cfg.JWTRefreshExpiry)
 
+	monitorRepo := repo.NewMonitorRepo(db)
+	monitorUC := usecase.NewMonitorUsecase(monitorRepo)
+	monitorHandler := handler.NewMonitorHandler(monitorUC)
+
+	userUC := usecase.NewUserUsecase(userRepo)
+	userHandler := handler.NewUserHandler(userUC)
+
 	r := gin.Default()
 	r.Use(middleware.CORS(cfg.CORSAllowedOrigins))
 
@@ -53,6 +61,24 @@ func main() {
 		protected.Use(middleware.JWTAuth(cfg.JWTAccessSecret))
 		protected.POST("/logout", authHandler.Logout)
 		protected.GET("/me", authHandler.Me)
+
+		jwtAuth := middleware.JWTAuth(cfg.JWTAccessSecret)
+		editorGuard := middleware.RoleGuard(domain.RoleEditor, domain.RoleAdmin)
+		adminGuard := middleware.RoleGuard(domain.RoleAdmin)
+
+		monitors := v1.Group("/monitors")
+		monitors.Use(jwtAuth)
+		monitors.GET("", monitorHandler.List)
+		monitors.GET("/:id", monitorHandler.Get)
+		monitors.POST("", editorGuard, monitorHandler.Create)
+		monitors.PUT("/:id", editorGuard, monitorHandler.Update)
+		monitors.DELETE("/:id", editorGuard, monitorHandler.Delete)
+
+		users := v1.Group("/users")
+		users.Use(jwtAuth, adminGuard)
+		users.GET("", userHandler.ListUsers)
+		users.PUT("/:id/role", userHandler.UpdateRole)
+		users.DELETE("/:id", userHandler.DeleteUser)
 	}
 
 	addr := fmt.Sprintf(":%s", cfg.APIPort)
