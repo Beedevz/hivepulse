@@ -8,6 +8,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -61,11 +62,23 @@ func main() {
 	scheduler := infra.NewScheduler(checkerUC)
 	scheduler.Start()
 
+	ctx := context.Background()
+	enabledMonitors, err := monitorRepo.FindAllEnabled(ctx)
+	if err != nil {
+		log.Printf("warning: could not load monitors for scheduler: %v", err)
+	} else {
+		for _, m := range enabledMonitors {
+			scheduler.Add(m)
+		}
+	}
+
 	monitorUC := usecase.NewMonitorUsecase(monitorRepo, scheduler)
 	monitorHandler := handler.NewMonitorHandler(monitorUC, heartbeatRepo)
 
 	userUC := usecase.NewUserUsecase(userRepo)
 	userHandler := handler.NewUserHandler(userUC)
+
+	wsHandler := handler.NewWSHandler(hub)
 
 	r := gin.Default()
 	r.Use(middleware.CORS(cfg.CORSAllowedOrigins))
@@ -103,7 +116,11 @@ func main() {
 		users.GET("", userHandler.ListUsers)
 		users.PUT("/:id/role", userHandler.UpdateRole)
 		users.DELETE("/:id", userHandler.DeleteUser)
+
+		v1.GET("/ws", jwtAuth, wsHandler.Connect)
 	}
+
+	defer scheduler.Stop()
 
 	addr := fmt.Sprintf(":%s", cfg.APIPort)
 	log.Printf("HivePulse API starting on %s", addr)
