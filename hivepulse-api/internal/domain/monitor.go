@@ -42,4 +42,5 @@ type Monitor struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	LastStatus string // "up" | "down" | "unknown"
 }
