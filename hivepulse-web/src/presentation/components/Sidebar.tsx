@@ -14,6 +14,12 @@ export function Sidebar() {
         >
           Dashboard
         </NavLink>
+        <NavLink
+          to="/alerts"
+          className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-700' : 'hover:bg-gray-800'}`}
+        >
+          Alerts
+        </NavLink>
         {user?.role !== 'viewer' && (
           <NavLink
             to="/settings"
