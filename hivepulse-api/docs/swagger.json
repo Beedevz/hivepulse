@@ -566,6 +566,64 @@
                 }
             }
         },
+        "/monitors/{id}/stats": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "monitors"
+                ],
+                "summary": "Get aggregated stats for a monitor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Monitor ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time range: 24h, 7d, or 90d",
+                        "name": "range",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.StatsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "security": [
@@ -747,6 +805,40 @@
         }
     },
     "definitions": {
+        "domain.StatsBucket": {
+            "type": "object",
+            "properties": {
+                "avg_ping_ms": {
+                    "type": "integer"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "total_count": {
+                    "type": "integer"
+                },
+                "up_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.StatsResponse": {
+            "type": "object",
+            "properties": {
+                "avg_ping_ms": {
+                    "type": "integer"
+                },
+                "buckets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.StatsBucket"
+                    }
+                },
+                "uptime_pct": {
+                    "type": "number"
+                }
+            }
+        },
         "handler.loginRequest": {
             "type": "object",
             "required": [

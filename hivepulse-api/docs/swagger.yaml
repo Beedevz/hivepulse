@@ -1,5 +1,27 @@
 basePath: /api/v1
 definitions:
+  domain.StatsBucket:
+    properties:
+      avg_ping_ms:
+        type: integer
+      time:
+        type: string
+      total_count:
+        type: integer
+      up_count:
+        type: integer
+    type: object
+  domain.StatsResponse:
+    properties:
+      avg_ping_ms:
+        type: integer
+      buckets:
+        items:
+          $ref: '#/definitions/domain.StatsBucket'
+        type: array
+      uptime_pct:
+        type: number
+    type: object
   handler.loginRequest:
     properties:
       email:
@@ -431,6 +453,43 @@ paths:
       security:
       - Bearer: []
       summary: List heartbeats for a monitor
+      tags:
+      - monitors
+  /monitors/{id}/stats:
+    get:
+      parameters:
+      - description: Monitor ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Time range: 24h, 7d, or 90d'
+        in: query
+        name: range
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.StatsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get aggregated stats for a monitor
       tags:
       - monitors
   /users:
