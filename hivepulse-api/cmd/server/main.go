@@ -74,8 +74,14 @@ func main() {
 		}
 	}
 
+	statsRepo := repo.NewStatsRepo(db)
+	statsUC := usecase.NewStatsUsecase(statsRepo)
+
+	aggregator := infra.NewAggregator(db)
+	go aggregator.Start(ctx)
+
 	monitorUC := usecase.NewMonitorUsecase(monitorRepo, scheduler)
-	monitorHandler := handler.NewMonitorHandler(monitorUC, heartbeatRepo)
+	monitorHandler := handler.NewMonitorHandler(monitorUC, heartbeatRepo, statsUC)
 
 	userUC := usecase.NewUserUsecase(userRepo)
 	userHandler := handler.NewUserHandler(userUC)
@@ -110,6 +116,7 @@ func main() {
 		monitors.GET("", monitorHandler.List)
 		monitors.GET("/:id", monitorHandler.Get)
 		monitors.GET("/:id/heartbeats", monitorHandler.Heartbeats)
+		monitors.GET("/:id/stats", monitorHandler.Stats)
 		monitors.POST("", editorGuard, monitorHandler.Create)
 		monitors.PUT("/:id", editorGuard, monitorHandler.Update)
 		monitors.DELETE("/:id", editorGuard, monitorHandler.Delete)
