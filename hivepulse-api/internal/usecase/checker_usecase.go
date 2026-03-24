@@ -75,7 +75,7 @@ func (u *CheckerUsecase) RunCheck(ctx context.Context, monitorID string) {
 	newStatus := heartbeat.Status
 
 	if err := u.monitors.UpdateLastStatus(ctx, monitorID, newStatus); err != nil {
-		log.Printf("checker: UpdateLastStatus failed for %s: %v", monitorID, err)
+		log.Printf("checker: UpdateLastStatus failed for %q: %v", monitorID, err)
 	}
 
 	switch {
@@ -86,11 +86,11 @@ func (u *CheckerUsecase) RunCheck(ctx context.Context, monitorID string) {
 			StartedAt:   heartbeat.CheckedAt,
 			ErrorMsg:    heartbeat.ErrorMsg,
 		}); err != nil {
-			log.Printf("checker: incidents.Create failed for %s: %v", monitorID, err)
+			log.Printf("checker: incidents.Create failed for %q: %v", monitorID, err)
 		}
 	case prevStatus == "down" && newStatus == "up":
 		if err := u.incidents.Resolve(ctx, monitorID, heartbeat.CheckedAt); err != nil {
-			log.Printf("checker: incidents.Resolve failed for %s: %v", monitorID, err)
+			log.Printf("checker: incidents.Resolve failed for %q: %v", monitorID, err)
 		}
 	}
 
