@@ -4,6 +4,9 @@ package repo_test
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -23,9 +26,17 @@ func setupTestDB(t *testing.T) *gorm.DB {
 		tcpostgres.WithDatabase("hivepulse_test"),
 		tcpostgres.WithUsername("test"),
 		tcpostgres.WithPassword("test"),
+		tcpostgres.BasicWaitStrategies(),
 	)
 	require.NoError(t, err)
 	t.Cleanup(func() { container.Terminate(ctx) })
+
+	// Resolve the hivepulse-api root so RunMigrations can find file://migrations
+	_, callerFile, _, _ := runtime.Caller(0)
+	apiRoot := filepath.Join(filepath.Dir(callerFile), "..", "..", "..")
+	orig, _ := os.Getwd()
+	require.NoError(t, os.Chdir(apiRoot))
+	t.Cleanup(func() { os.Chdir(orig) })
 
 	dsn, _ := container.ConnectionString(ctx, "sslmode=disable")
 	db := infrastructure.NewDatabase(dsn)
@@ -108,4 +119,118 @@ func TestTokenRepo_DeleteExpired(t *testing.T) {
 	ctx := context.Background()
 
 	require.NoError(t, tr.DeleteExpired(ctx))
+}
+
+func TestMonitorRepo_UpdateLastStatus(t *testing.T) {
+	db := setupTestDB(t)
+	r := repo.NewMonitorRepo(db)
+	ctx := context.Background()
+
+	userRepo := repo.NewUserRepo(db)
+	user := &domain.User{Email: "u@ex.com", Name: "U", PasswordHash: "h", Role: domain.RoleAdmin}
+	require.NoError(t, userRepo.Create(ctx, user))
+
+	m := &domain.Monitor{
+		UserID: user.ID, Name: "Mon", CheckType: domain.CheckHTTP,
+		Interval: 60, Timeout: 10, Enabled: true,
+	}
+	require.NoError(t, r.Create(ctx, m))
+
+	require.NoError(t, r.UpdateLastStatus(ctx, m.ID, "down"))
+
+	found, err := r.FindByID(ctx, m.ID)
+	require.NoError(t, err)
+	assert.Equal(t, "down", found.LastStatus)
+}
+
+func setupMonitorForIncidentTest(t *testing.T, db *gorm.DB) (*domain.Monitor, string) {
+	t.Helper()
+	ctx := context.Background()
+	userRepo := repo.NewUserRepo(db)
+	user := &domain.User{Email: "inc@ex.com", Name: "Inc", PasswordHash: "h", Role: domain.RoleAdmin}
+	require.NoError(t, userRepo.Create(ctx, user))
+	monitorRepo := repo.NewMonitorRepo(db)
+	m := &domain.Monitor{
+		UserID: user.ID, Name: "Inc Monitor", CheckType: domain.CheckHTTP,
+		Interval: 60, Timeout: 10, Enabled: true,
+	}
+	require.NoError(t, monitorRepo.Create(ctx, m))
+	return m, m.ID
+}
+
+func TestIncidentRepo_CreateAndFindActive(t *testing.T) {
+	db := setupTestDB(t)
+	r := repo.NewIncidentRepo(db)
+	ctx := context.Background()
+	m, monitorID := setupMonitorForIncidentTest(t, db)
+
+	inc := &domain.Incident{
+		MonitorID:   monitorID,
+		MonitorName: m.Name,
+		StartedAt:   time.Now(),
+		ErrorMsg:    "connection refused",
+	}
+	require.NoError(t, r.Create(ctx, inc))
+	assert.NotZero(t, inc.ID)
+
+	active, err := r.FindActive(ctx)
+	require.NoError(t, err)
+	require.Len(t, active, 1)
+	assert.Equal(t, monitorID, active[0].MonitorID)
+	assert.Nil(t, active[0].ResolvedAt)
+}
+
+func TestIncidentRepo_Resolve(t *testing.T) {
+	db := setupTestDB(t)
+	r := repo.NewIncidentRepo(db)
+	ctx := context.Background()
+	m, monitorID := setupMonitorForIncidentTest(t, db)
+
+	inc := &domain.Incident{MonitorID: monitorID, MonitorName: m.Name, StartedAt: time.Now()}
+	require.NoError(t, r.Create(ctx, inc))
+
+	resolvedAt := time.Now().Add(5 * time.Minute)
+	require.NoError(t, r.Resolve(ctx, monitorID, resolvedAt))
+
+	active, err := r.FindActive(ctx)
+	require.NoError(t, err)
+	assert.Empty(t, active)
+
+	resolved, err := r.FindResolved(ctx, 10)
+	require.NoError(t, err)
+	require.Len(t, resolved, 1)
+	assert.NotNil(t, resolved[0].ResolvedAt)
+}
+
+func TestIncidentRepo_Resolve_Idempotent(t *testing.T) {
+	db := setupTestDB(t)
+	r := repo.NewIncidentRepo(db)
+	ctx := context.Background()
+	_, monitorID := setupMonitorForIncidentTest(t, db)
+
+	// No open incident — should be no-op, no error
+	err := r.Resolve(ctx, monitorID, time.Now())
+	assert.NoError(t, err)
+}
+
+func TestIncidentRepo_FindRecent(t *testing.T) {
+	db := setupTestDB(t)
+	r := repo.NewIncidentRepo(db)
+	ctx := context.Background()
+	m, monitorID := setupMonitorForIncidentTest(t, db)
+
+	for i := 0; i < 3; i++ {
+		inc := &domain.Incident{
+			MonitorID: monitorID, MonitorName: m.Name,
+			StartedAt: time.Now().Add(time.Duration(i) * time.Minute),
+		}
+		require.NoError(t, r.Create(ctx, inc))
+		if i < 2 {
+			require.NoError(t, r.Resolve(ctx, monitorID, time.Now().Add(time.Duration(i)*time.Minute+time.Second)))
+		}
+	}
+
+	recent, err := r.FindRecent(ctx, 10)
+	require.NoError(t, err)
+	assert.Len(t, recent, 3)
 }

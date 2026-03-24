@@ -165,6 +165,24 @@ func (_m *MonitorRepository) Update(ctx context.Context, m *domain.Monitor) erro
 	return r0
 }
 
+// UpdateLastStatus provides a mock function with given fields: ctx, monitorID, status
+func (_m *MonitorRepository) UpdateLastStatus(ctx context.Context, monitorID string, status string) error {
+	ret := _m.Called(ctx, monitorID, status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateLastStatus")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, monitorID, status)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewMonitorRepository creates a new instance of MonitorRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMonitorRepository(t interface {

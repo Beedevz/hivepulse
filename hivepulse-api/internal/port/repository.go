@@ -31,10 +31,23 @@ type MonitorRepository interface {
 	Update(ctx context.Context, m *domain.Monitor) error
 	Delete(ctx context.Context, id string) error
 	FindAllEnabled(ctx context.Context) ([]*domain.Monitor, error)
+	UpdateLastStatus(ctx context.Context, monitorID string, status string) error
 }
 
 type HeartbeatRepository interface {
 	Create(ctx context.Context, h *domain.Heartbeat) error
 	FindLatest(ctx context.Context, monitorID string, limit int) ([]*domain.Heartbeat, error)
 	GetUptime(ctx context.Context, monitorID string, since time.Time) (int64, int64, error) // up, total
+}
+
+type IncidentRepository interface {
+	Create(ctx context.Context, incident *domain.Incident) error
+	// Resolve sets resolved_at for the open incident for monitorID.
+	// Idempotent: if no open incident exists, this is a no-op (no error).
+	Resolve(ctx context.Context, monitorID string, resolvedAt time.Time) error
+	FindActive(ctx context.Context) ([]*domain.Incident, error)
+	// FindRecent returns the last `limit` incidents regardless of status, ordered by started_at DESC.
+	FindRecent(ctx context.Context, limit int) ([]*domain.Incident, error)
+	// FindResolved returns the last `limit` resolved incidents, ordered by resolved_at DESC.
+	FindResolved(ctx context.Context, limit int) ([]*domain.Incident, error)
 }
