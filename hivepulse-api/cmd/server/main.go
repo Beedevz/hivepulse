@@ -43,6 +43,7 @@ func main() {
 
 	monitorRepo := repo.NewMonitorRepo(db)
 	heartbeatRepo := repo.NewHeartbeatRepo(db)
+	incidentRepo := repo.NewIncidentRepo(db)
 
 	hub := infra.NewHub()
 	go hub.Run()
@@ -50,6 +51,7 @@ func main() {
 	checkerUC := usecase.NewCheckerUsecase(
 		monitorRepo,
 		heartbeatRepo,
+		incidentRepo,
 		map[domain.CheckType]port.CheckerService{
 			domain.CheckHTTP: service.NewHTTPChecker(),
 			domain.CheckTCP:  service.NewTCPChecker(),
@@ -79,6 +81,7 @@ func main() {
 	userHandler := handler.NewUserHandler(userUC)
 
 	wsHandler := handler.NewWSHandler(hub)
+	incidentHandler := handler.NewIncidentHandler(incidentRepo)
 
 	r := gin.Default()
 	r.Use(middleware.CORS(cfg.CORSAllowedOrigins))
@@ -110,6 +113,10 @@ func main() {
 		monitors.POST("", editorGuard, monitorHandler.Create)
 		monitors.PUT("/:id", editorGuard, monitorHandler.Update)
 		monitors.DELETE("/:id", editorGuard, monitorHandler.Delete)
+
+		incidents := v1.Group("/incidents")
+		incidents.Use(jwtAuth)
+		incidents.GET("", incidentHandler.List)
 
 		users := v1.Group("/users")
 		users.Use(jwtAuth, adminGuard)
