@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ChannelCard } from '../ChannelCard'
 import type { NotificationChannel } from '../../../domain/notification'
+
+function renderWithQuery(ui: React.ReactElement) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  return render(<QueryClientProvider client={qc}>{ui}</QueryClientProvider>)
+}
 
 const mockChannel: NotificationChannel = {
   id: 'ch-1',
@@ -17,19 +23,19 @@ const mockChannel: NotificationChannel = {
 
 describe('ChannelCard', () => {
   it('renders channel name and type', () => {
-    render(<ChannelCard channel={mockChannel} onEdit={vi.fn()} onDelete={vi.fn()} />)
+    renderWithQuery(<ChannelCard channel={mockChannel} onEdit={vi.fn()} onDelete={vi.fn()} />)
     expect(screen.getByText('Ops Email')).toBeInTheDocument()
     expect(screen.getAllByText(/email/i).length).toBeGreaterThan(0)
   })
 
   it('shows Global badge when is_global is true', () => {
-    render(<ChannelCard channel={mockChannel} onEdit={vi.fn()} onDelete={vi.fn()} />)
+    renderWithQuery(<ChannelCard channel={mockChannel} onEdit={vi.fn()} onDelete={vi.fn()} />)
     expect(screen.getByText(/global/i)).toBeInTheDocument()
   })
 
   it('calls onDelete when delete button is clicked', async () => {
     const onDelete = vi.fn()
-    render(<ChannelCard channel={mockChannel} onEdit={vi.fn()} onDelete={onDelete} />)
+    renderWithQuery(<ChannelCard channel={mockChannel} onEdit={vi.fn()} onDelete={onDelete} />)
     await userEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(onDelete).toHaveBeenCalledWith('ch-1')
   })

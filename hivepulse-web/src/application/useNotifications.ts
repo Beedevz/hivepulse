@@ -71,3 +71,32 @@ export const useUnassignChannel = () => {
       qc.invalidateQueries({ queryKey: ['monitor-channels', monitorId] }),
   })
 }
+
+export const useTestChannel = () =>
+  useMutation({
+    mutationFn: (channelId: string) =>
+      apiClient.post(`/notification-channels/${channelId}/test`).then((r) => r.data),
+  })
+
+export interface SMTPSettings {
+  host: string
+  port: number
+  user: string
+  password: string
+  from: string
+}
+
+export const useSMTPSettings = () =>
+  useQuery<SMTPSettings>({
+    queryKey: ['settings', 'smtp'],
+    queryFn: () => apiClient.get('/settings/smtp').then((r) => r.data),
+  })
+
+export const useUpdateSMTPSettings = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (input: SMTPSettings) =>
+      apiClient.put('/settings/smtp', input).then((r) => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['settings', 'smtp'] }),
+  })
+}

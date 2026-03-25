@@ -37,4 +37,13 @@ export const notificationHandlers = [
   http.delete('http://localhost:8080/api/v1/monitors/:id/channels/:chID', () =>
     new HttpResponse(null, { status: 204 })
   ),
+  http.post('http://localhost:8080/api/v1/notification-channels/:id/test', () =>
+    HttpResponse.json({ message: 'test notification sent' })
+  ),
+  http.get('http://localhost:8080/api/v1/settings/smtp', () =>
+    HttpResponse.json({ host: '', port: 587, user: '', password: '', from: '' })
+  ),
+  http.put('http://localhost:8080/api/v1/settings/smtp', () =>
+    HttpResponse.json({ message: 'smtp settings updated' })
+  ),
 ]

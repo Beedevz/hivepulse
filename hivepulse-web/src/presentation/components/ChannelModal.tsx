@@ -10,6 +10,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Switch from '@mui/material/Switch'
 import Box from '@mui/material/Box'
+import Tooltip from '@mui/material/Tooltip'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { NotificationChannel, CreateChannelInput, ChannelType } from '../../domain/notification'
 
 interface Props {
@@ -132,7 +134,14 @@ export function ChannelModal({ open, onClose, onSubmit, channel, defaultType = '
 
           <FormControlLabel
             control={<Checkbox checked={isGlobal} onChange={e => setIsGlobal(e.target.checked)} />}
-            label="Is Global"
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                Global channel
+                <Tooltip title="Global channels fire for all monitors that don't have a specific channel override assigned. Uncheck to use this channel only when explicitly assigned to a monitor.">
+                  <InfoOutlinedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                </Tooltip>
+              </Box>
+            }
           />
 
           <FormControlLabel
