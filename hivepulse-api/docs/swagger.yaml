@@ -95,6 +95,19 @@ definitions:
     - name
     - password
     type: object
+  handler.smtpConfig:
+    properties:
+      from:
+        type: string
+      host:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      user:
+        type: string
+    type: object
 info:
   contact: {}
   description: Open-source uptime monitoring platform
@@ -492,6 +505,62 @@ paths:
       summary: Get aggregated stats for a monitor
       tags:
       - monitors
+  /settings/smtp:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.smtpConfig'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Get SMTP settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: SMTP configuration
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.smtpConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Update SMTP settings
+      tags:
+      - settings
   /users:
     get:
       parameters:

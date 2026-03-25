@@ -18,6 +18,7 @@ type NotificationService interface {
 	AssignChannel(ctx context.Context, monitorID, channelID string) error
 	UnassignChannel(ctx context.Context, monitorID, channelID string) error
 	ListLogs(ctx context.Context, channelID string) ([]*domain.NotificationLog, error)
+	SendTest(ctx context.Context, channelID string, monitor *domain.Monitor) error
 }
 
 type NotificationHandler struct{ svc NotificationService }
@@ -174,4 +175,17 @@ func (h *NotificationHandler) UnassignChannel(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusNoContent)
+}
+
+func (h *NotificationHandler) TestChannel(c *gin.Context) {
+	testMonitor := &domain.Monitor{
+		ID:   "test",
+		Name: "Test Monitor (HivePulse Test)",
+		URL:  "https://example.com",
+	}
+	if err := h.svc.SendTest(c.Request.Context(), c.Param("id"), testMonitor); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "test notification sent"})
 }

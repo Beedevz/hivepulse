@@ -46,6 +46,9 @@ func (m *mockNotificationService) UnassignChannel(_ context.Context, _, _ string
 func (m *mockNotificationService) ListLogs(_ context.Context, _ string) ([]*domain.NotificationLog, error) {
 	return nil, m.err
 }
+func (m *mockNotificationService) SendTest(_ context.Context, _ string, _ *domain.Monitor) error {
+	return m.err
+}
 
 func setupNotificationRouter(svc handler.NotificationService, role domain.Role) *gin.Engine {
 	gin.SetMode(gin.TestMode)

@@ -95,6 +95,9 @@ func main() {
 
 	notifHandler := handler.NewNotificationHandler(notifUC)
 
+	handler.LoadSMTPFromDB(db, cfg)
+	settingsHandler := handler.NewSettingsHandler(db, cfg)
+
 	monitorUC := usecase.NewMonitorUsecase(monitorRepo, scheduler)
 	monitorHandler := handler.NewMonitorHandler(monitorUC, heartbeatRepo, statsUC)
 
@@ -146,6 +149,12 @@ func main() {
 		notifs.PUT("/:id", notifHandler.Update)
 		notifs.DELETE("/:id", notifHandler.Delete)
 		notifs.GET("/:id/logs", notifHandler.Logs)
+		notifs.POST("/:id/test", notifHandler.TestChannel)
+
+		settings := v1.Group("/settings")
+		settings.Use(jwtAuth, adminGuard)
+		settings.GET("/smtp", settingsHandler.GetSMTP)
+		settings.PUT("/smtp", settingsHandler.PutSMTP)
 
 		incidents := v1.Group("/incidents")
 		incidents.Use(jwtAuth)

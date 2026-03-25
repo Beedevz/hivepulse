@@ -107,3 +107,11 @@ func (u *NotificationUsecase) GetChannelsForMonitor(ctx context.Context, monitor
 func (u *NotificationUsecase) ListLogs(ctx context.Context, channelID string) ([]*domain.NotificationLog, error) {
 	return u.repo.ListLogs(ctx, channelID)
 }
+
+func (u *NotificationUsecase) SendTest(ctx context.Context, channelID string, monitor *domain.Monitor) error {
+	ch, err := u.repo.GetChannel(ctx, channelID)
+	if err != nil {
+		return err
+	}
+	return u.sender.Send(ctx, ch, domain.EventDown, monitor)
+}
