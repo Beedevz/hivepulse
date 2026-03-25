@@ -1,12 +1,65 @@
 import { useState } from 'react'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import { useUsers, useUpdateUserRole, useDeleteUser } from '../../application/useUsers'
 import { useMe } from '../../application/useAuth'
+import { useChannels, useCreateChannel, useUpdateChannel, useDeleteChannel } from '../../application/useNotifications'
 import { UserTable } from '../components/UserTable'
+import { ChannelCard } from '../components/ChannelCard'
+import { ChannelModal } from '../components/ChannelModal'
 import { Sidebar } from '../components/Sidebar'
+import type { NotificationChannel, CreateChannelInput } from '../../domain/notification'
+
+function NotificationsTab() {
+  const { data: channels = [] } = useChannels()
+  const createChannel = useCreateChannel()
+  const updateChannel = useUpdateChannel()
+  const deleteChannel = useDeleteChannel()
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editChannel, setEditChannel] = useState<NotificationChannel | null>(null)
+
+  const handleEdit = (ch: NotificationChannel) => {
+    setEditChannel(ch)
+    setModalOpen(true)
+  }
+
+  const handleDelete = (id: string) => {
+    deleteChannel.mutate(id)
+  }
+
+  const handleSubmit = (input: CreateChannelInput) => {
+    if (editChannel) {
+      updateChannel.mutate({ id: editChannel.id, ...input })
+    } else {
+      createChannel.mutate(input)
+    }
+    setModalOpen(false)
+    setEditChannel(null)
+  }
+
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">Notification Channels</Typography>
+        <Button variant="contained" onClick={() => { setEditChannel(null); setModalOpen(true) }}>
+          Add Channel
+        </Button>
+      </Box>
+      {channels.map((ch) => (
+        <ChannelCard key={ch.id} channel={ch} onEdit={handleEdit} onDelete={handleDelete} />
+      ))}
+      <ChannelModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setEditChannel(null) }}
+        onSubmit={handleSubmit}
+        channel={editChannel ?? undefined}
+      />
+    </Box>
+  )
+}
 
 export function SettingsPage() {
   const [tab, setTab] = useState(0)
@@ -42,6 +95,7 @@ export function SettingsPage() {
           >
             <Tab label="General" />
             {me?.role === 'admin' && <Tab label="Users" />}
+            {me?.role === 'admin' && <Tab label="Notifications" />}
           </Tabs>
 
           {tab === 0 && (
@@ -57,6 +111,10 @@ export function SettingsPage() {
               onRoleChange={(id, role) => updateRoleMutation.mutate({ id, role })}
               onDelete={(id) => deleteUserMutation.mutate(id)}
             />
+          )}
+
+          {tab === 2 && me?.role === 'admin' && (
+            <NotificationsTab />
           )}
         </Box>
       </Box>
