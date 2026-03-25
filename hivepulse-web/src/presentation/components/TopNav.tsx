@@ -88,7 +88,7 @@ export function TopNav() {
             display: 'flex',
             alignItems: 'center',
             gap: 0.5,
-            bgcolor: downCount > 0 ? 'rgba(248,113,113,0.08)' : '#0f2a1a',
+            bgcolor: downCount > 0 ? 'rgba(248,113,113,0.08)' : 'rgba(74,222,128,0.08)',
             border: '1px solid',
             borderColor: downCount > 0 ? 'rgba(248,113,113,0.3)' : 'rgba(74,222,128,0.2)',
             px: 1,
@@ -114,6 +114,10 @@ export function TopNav() {
         {/* Avatar */}
         <Box
           onClick={(e) => setAnchorEl(e.currentTarget)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setAnchorEl(e.currentTarget as HTMLElement) }}
+          role="button"
+          tabIndex={0}
+          aria-label="User menu"
           sx={{
             width: 24,
             height: 24,
