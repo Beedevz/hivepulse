@@ -43,7 +43,7 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
   return (
     <Box
       sx={{
-        width: 260,
+        width: 300,
         flexShrink: 0,
         borderRight: '1px solid',
         borderColor: 'divider',
@@ -59,8 +59,8 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          px: 1.5,
-          py: 1,
+          px: 2,
+          py: 1.25,
           borderBottom: '1px solid',
           borderColor: 'divider',
           flexShrink: 0,
@@ -68,14 +68,14 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <Typography
-            fontSize="0.5625rem"
+            fontSize="0.6875rem"
             color="text.secondary"
             textTransform="uppercase"
             letterSpacing="0.08em"
           >
             Monitors
           </Typography>
-          <Typography fontSize="0.5625rem" color="text.disabled">
+          <Typography fontSize="0.6875rem" color="text.disabled">
             {monitors.length}
           </Typography>
         </Box>
@@ -99,12 +99,12 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
       </Box>
 
       {/* Search */}
-      <Box sx={{ px: 1.25, py: 0.75, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
+      <Box sx={{ px: 1.5, py: 1, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
         <MonitorSearch onSearch={setSearchTerm} />
       </Box>
 
       {/* Monitor list */}
-      <Box sx={{ flex: 1, overflowY: 'auto', p: 1, display: 'flex', flexDirection: 'column', gap: 0.375 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', p: 1.25, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
         {filtered.length === 0 && (
           <Typography fontSize="0.5625rem" color="text.disabled" textAlign="center" sx={{ mt: 2 }}>
             No monitors found

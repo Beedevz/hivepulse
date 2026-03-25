@@ -60,32 +60,32 @@ export const MonitorListItem = forwardRef<HTMLDivElement, MonitorListItemProps>(
             : isSelected
             ? `${statusColor}10`
             : 'background.paper',
-          px: 1,
-          py: 0.75,
+          px: 1.25,
+          py: 1,
           cursor: 'pointer',
           '&:hover': { borderColor: `${statusColor}60` },
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.25 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.375 }}>
           <Box
             sx={{
-              width: 6,
-              height: 6,
+              width: 7,
+              height: 7,
               borderRadius: '50%',
               bgcolor: statusColor,
               flexShrink: 0,
-              boxShadow: monitor.last_status !== 'unknown' ? `0 0 4px ${statusColor}88` : 'none',
+              boxShadow: monitor.last_status !== 'unknown' ? `0 0 5px ${statusColor}88` : 'none',
             }}
           />
-          <Typography fontSize="0.625rem" fontWeight={600} color="text.primary" noWrap sx={{ flex: 1 }}>
+          <Typography fontSize="0.75rem" fontWeight={600} color="text.primary" noWrap sx={{ flex: 1 }}>
             {monitor.name}
           </Typography>
-          <Typography fontSize="0.5rem" fontWeight={700} color={statusColor} sx={{ flexShrink: 0 }}>
+          <Typography fontSize="0.6875rem" fontWeight={700} color={statusColor} sx={{ flexShrink: 0 }}>
             {(monitor.uptime_24h * 100).toFixed(1)}%
           </Typography>
         </Box>
 
-        <Typography fontSize="0.5rem" color="text.secondary" noWrap sx={{ mb: 0.375 }}>
+        <Typography fontSize="0.625rem" color="text.secondary" noWrap sx={{ mb: 0.5 }}>
           {subLabel}
         </Typography>
 

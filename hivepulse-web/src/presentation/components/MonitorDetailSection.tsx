@@ -151,7 +151,16 @@ export function MonitorDetailSection({ monitorId, onEdit, onDelete }: Readonly<M
       {/* Content */}
       <Box sx={{ flex: 1, px: 4, py: 3 }}>
         {/* Uptime Heatmap */}
-        <Box sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            mb: 2.5,
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1.5,
+            p: 2.5,
+          }}
+        >
           <Typography variant="subtitle1" fontWeight={600} color="text.primary" sx={{ mb: 1.5 }}>
             Uptime — last 90 days
           </Typography>
@@ -161,18 +170,28 @@ export function MonitorDetailSection({ monitorId, onEdit, onDelete }: Readonly<M
         </Box>
 
         {/* Response Time Chart */}
-        <Box>
-          <Typography variant="subtitle1" fontWeight={600} color="text.primary" sx={{ mb: 1 }}>
-            Response Time
-          </Typography>
-          <Tabs
-            value={chartRange}
-            onChange={(_, v) => setChartRange(v)}
-            sx={{ mb: 2, minHeight: 36, '& .MuiTab-root': { minHeight: 36, py: 0.5 } }}
-          >
-            <Tab label="24h" value="24h" />
-            <Tab label="7d" value="7d" />
-          </Tabs>
+        <Box
+          sx={{
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1.5,
+            p: 2.5,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="subtitle1" fontWeight={600} color="text.primary">
+              Response Time
+            </Typography>
+            <Tabs
+              value={chartRange}
+              onChange={(_, v) => setChartRange(v)}
+              sx={{ minHeight: 32, '& .MuiTab-root': { minHeight: 32, py: 0, px: 1.5, fontSize: '0.75rem' } }}
+            >
+              <Tab label="24h" value="24h" />
+              <Tab label="7d" value="7d" />
+            </Tabs>
+          </Box>
           {chartLoading && <CircularProgress size={24} />}
           {chartError && <Alert severity="error">Failed to load response time data.</Alert>}
           {chartStats && <ResponseTimeChart buckets={chartStats.buckets} range={chartRange} />}
