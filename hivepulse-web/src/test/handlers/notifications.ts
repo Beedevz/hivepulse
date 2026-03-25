@@ -1,0 +1,40 @@
+import { http, HttpResponse } from 'msw'
+import type { NotificationChannel } from '../../domain/notification'
+
+const mockChannel: NotificationChannel = {
+  id: 'ch-1',
+  name: 'Ops Email',
+  type: 'email',
+  config: { to: 'ops@example.com' },
+  is_global: true,
+  enabled: true,
+  remind_interval_min: 0,
+  created_at: '2026-03-25T00:00:00Z',
+}
+
+export const notificationHandlers = [
+  http.get('http://localhost:8080/api/v1/notification-channels', () =>
+    HttpResponse.json({ data: [mockChannel] })
+  ),
+  http.post('http://localhost:8080/api/v1/notification-channels', () =>
+    HttpResponse.json(mockChannel, { status: 201 })
+  ),
+  http.put('http://localhost:8080/api/v1/notification-channels/:id', () =>
+    HttpResponse.json({ message: 'channel updated' })
+  ),
+  http.delete('http://localhost:8080/api/v1/notification-channels/:id', () =>
+    new HttpResponse(null, { status: 204 })
+  ),
+  http.get('http://localhost:8080/api/v1/notification-channels/:id/logs', () =>
+    HttpResponse.json({ data: [] })
+  ),
+  http.get('http://localhost:8080/api/v1/monitors/:id/channels', () =>
+    HttpResponse.json({ data: [] })
+  ),
+  http.post('http://localhost:8080/api/v1/monitors/:id/channels/:chID', () =>
+    new HttpResponse(null, { status: 201 })
+  ),
+  http.delete('http://localhost:8080/api/v1/monitors/:id/channels/:chID', () =>
+    new HttpResponse(null, { status: 204 })
+  ),
+]
