@@ -30,9 +30,9 @@ export function ChannelModal({ open, onClose, onSubmit, channel, defaultType = '
   const [remindInterval, setRemindInterval] = useState(String(channel?.remind_interval_min ?? 0))
 
   const [emailTo, setEmailTo] = useState(channel?.type === 'email' ? (channel.config.to ?? '') : '')
-  const [webhookUrl, setWebhookUrl] = useState('')
+  const [webhookUrl, setWebhookUrl] = useState(channel?.type === 'webhook' ? (channel.config.url ?? '') : '')
   const [webhookSecret, setWebhookSecret] = useState('')
-  const [slackUrl, setSlackUrl] = useState('')
+  const [slackUrl, setSlackUrl] = useState(channel?.type === 'slack' ? (channel.config.webhook_url ?? '') : '')
 
   function handleSubmit() {
     const config: Record<string, string> = {}
@@ -40,10 +40,10 @@ export function ChannelModal({ open, onClose, onSubmit, channel, defaultType = '
     if (type === 'email') {
       if (emailTo) config.to = emailTo
     } else if (type === 'webhook') {
-      if (webhookUrl) config.url = webhookUrl
+      if (webhookUrl && webhookUrl !== '***') config.url = webhookUrl
       if (webhookSecret) config.secret = webhookSecret
     } else if (type === 'slack') {
-      if (slackUrl) config.webhook_url = slackUrl
+      if (slackUrl && slackUrl !== '***') config.webhook_url = slackUrl
     }
 
     onSubmit({
