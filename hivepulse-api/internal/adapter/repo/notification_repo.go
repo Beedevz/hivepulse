@@ -78,7 +78,7 @@ func (r *NotificationRepo) DeleteChannel(ctx context.Context, id string) error {
 
 func (r *NotificationRepo) ListChannels(ctx context.Context) ([]*domain.NotificationChannel, error) {
 	var rows []notificationChannelModel
-	if err := r.db.WithContext(ctx).Find(&rows).Error; err != nil {
+	if err := r.db.WithContext(ctx).Order("created_at ASC").Find(&rows).Error; err != nil {
 		return nil, err
 	}
 	result := make([]*domain.NotificationChannel, len(rows))
@@ -168,7 +168,7 @@ func (r *NotificationRepo) ListLogs(ctx context.Context, channelID string) ([]*d
 	var rows []logRow
 	if err := r.db.WithContext(ctx).Raw(
 		`SELECT id, channel_id, monitor_id, event, status, error_msg, sent_at
-		 FROM notification_logs WHERE channel_id = ? ORDER BY sent_at DESC`,
+		 FROM notification_logs WHERE channel_id = ? ORDER BY sent_at DESC LIMIT 100`,
 		channelID,
 	).Scan(&rows).Error; err != nil {
 		return nil, err
@@ -241,7 +241,7 @@ func (r *NotificationRepo) HasRecentSSLLog(ctx context.Context, monitorID string
 	err := r.db.WithContext(ctx).Raw(
 		`SELECT COUNT(*) FROM notification_logs
 		 WHERE monitor_id = ? AND event = 'ssl_expiry' AND sent_at > NOW() - ?::INTERVAL`,
-		monitorID, within.String(),
+		monitorID, fmt.Sprintf("%.0f seconds", within.Seconds()),
 	).Scan(&count).Error
 	if err != nil {
 		return false, err
