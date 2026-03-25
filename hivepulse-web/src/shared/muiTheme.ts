@@ -95,7 +95,6 @@ export const darkTheme = createTheme({
         ...cssBaselineOverrides,
         '#root': {
           minHeight: '100vh',
-          backgroundImage: hexDark,
           backgroundRepeat: 'repeat',
           backgroundAttachment: 'fixed',
         },
@@ -186,7 +185,6 @@ export const lightTheme = createTheme({
         ...cssBaselineOverrides,
         '#root': {
           minHeight: '100vh',
-          backgroundImage: hexLight,
           backgroundRepeat: 'repeat',
           backgroundAttachment: 'fixed',
         },
