@@ -47,7 +47,7 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
         flexShrink: 0,
         borderRight: '1px solid',
         borderColor: 'divider',
-        bgcolor: '#1e2235',
+        bgcolor: colors.leftPanelBg,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

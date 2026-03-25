@@ -96,13 +96,19 @@ export function TopNav() {
             borderRadius: 10,
           }}
         >
-          <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: colors.up }} />
-          <Typography fontSize="0.6875rem" fontWeight={600} color={colors.up}>
-            {upCount} up
-          </Typography>
+          {(upCount > 0 || downCount === 0) && (
+            <>
+              <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: colors.up }} />
+              <Typography fontSize="0.6875rem" fontWeight={600} color={colors.up}>
+                {upCount} up
+              </Typography>
+            </>
+          )}
+          {upCount > 0 && downCount > 0 && (
+            <Typography fontSize="0.6875rem" color="text.disabled" mx={0.25}>·</Typography>
+          )}
           {downCount > 0 && (
             <>
-              <Typography fontSize="0.6875rem" color="text.disabled" mx={0.25}>·</Typography>
               <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: colors.down }} />
               <Typography fontSize="0.6875rem" fontWeight={600} color={colors.down}>
                 {downCount} down
