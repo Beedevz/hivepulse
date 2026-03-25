@@ -2,6 +2,35 @@
 
 All notable changes to HivePulse are documented here.
 
+## [v0.8.0] — 2026-03-25
+
+### 🚀 New Features
+
+- Replace sidebar navigation with TopNav + split-panel layout (LeftPanel + detail panel) ([`02c280d`](https://github.com/Beedevz/hivepulse/commit/02c280d))
+- Add AppLayout wrapping all private routes via React Router Outlet ([`b4bc012`](https://github.com/Beedevz/hivepulse/commit/b4bc012))
+- Add LeftPanel with monitor list, search/filter, and scroll-to-selected ([`07997e3`](https://github.com/Beedevz/hivepulse/commit/07997e3))
+- Add MonitorListItem compact rows with UptimeBar, status dot, uptime %, avg ping ([`5644e49`](https://github.com/Beedevz/hivepulse/commit/5644e49))
+- Add StatsBar with 4 metric cells: avg uptime, monitors down, active incidents, total monitors ([`e1aa551`](https://github.com/Beedevz/hivepulse/commit/e1aa551))
+- Add MonitorDetailSection with stats summary row, heatmap, response time chart, notification channels ([`3ae5770`](https://github.com/Beedevz/hivepulse/commit/3ae5770))
+- Add MonitorsPage split-panel layout with mobile-responsive stacking ([`5b1bfef`](https://github.com/Beedevz/hivepulse/commit/5b1bfef))
+- Redesign notification channels section: card style, type-coloured chips, filtered assign dropdown ([`e702b14`](https://github.com/Beedevz/hivepulse/commit/e702b14))
+- Add CartesianGrid and styled tooltip to ResponseTimeChart ([`e702b14`](https://github.com/Beedevz/hivepulse/commit/e702b14))
+- Add card backgrounds to Uptime Heatmap and Response Time sections ([`ea6f0ca`](https://github.com/Beedevz/hivepulse/commit/ea6f0ca))
+- Add 30d range to stats API using daily buckets ([`e702b14`](https://github.com/Beedevz/hivepulse/commit/e702b14))
+
+### 🐛 Bug Fixes
+
+- Fix GET /monitors/:id returning uptime_24h: 0 (now queries heartbeats like List) ([`e702b14`](https://github.com/Beedevz/hivepulse/commit/e702b14))
+- Fix monitor edit modal showing blank DNS/TCP/HTTP fields (missing fields in monitorResponse) ([`e702b14`](https://github.com/Beedevz/hivepulse/commit/e702b14))
+- Fix TopNav status pill always showing green dot; now respects up/down counts ([`7653420`](https://github.com/Beedevz/hivepulse/commit/7653420))
+- Fix TopNav status pill using hardcoded dark color instead of theme-safe rgba ([`97bf966`](https://github.com/Beedevz/hivepulse/commit/97bf966))
+- Remove unsupported 'slow'/'degraded' status from MonitorListItem and UptimeBar ([`b5bf3ea`](https://github.com/Beedevz/hivepulse/commit/b5bf3ea))
+- Resolve lint errors: no-explicit-any in tests, exhaustive-deps in useInitAuth ([`c5bedde`](https://github.com/Beedevz/hivepulse/commit/c5bedde))
+
+### 🗑️ Removed
+
+- Delete orphaned Sidebar, MonitorCard, MonitorTable, DashboardPage, MonitorDetailPage components ([`a8a5455`](https://github.com/Beedevz/hivepulse/commit/a8a5455))
+
 ## [v0.7.0] — 2026-03-25
 
 ### 🚀 New Features
