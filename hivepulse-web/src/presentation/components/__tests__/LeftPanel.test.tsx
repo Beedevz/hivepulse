@@ -38,4 +38,32 @@ describe('LeftPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: /\+ add/i }))
     expect(onAdd).toHaveBeenCalled()
   })
+
+  it('hides monitors that do not match search term', async () => {
+    render(<LeftPanel selectedMonitorId={null} onAddClick={vi.fn()} />, { wrapper })
+    // Wait for "Test API" to appear (MSW returns it)
+    await waitFor(() => expect(screen.getByText('Test API')).toBeInTheDocument())
+
+    // Type a non-matching term in the search input
+    const searchInput = screen.getByPlaceholderText('Search monitors…')
+    fireEvent.change(searchInput, { target: { value: 'zzz-no-match' } })
+
+    // Monitor should be gone, empty state should appear
+    await waitFor(() => {
+      expect(screen.queryByText('Test API')).not.toBeInTheDocument()
+      expect(screen.getByText('No monitors found')).toBeInTheDocument()
+    })
+  })
+
+  it('shows empty state when no monitors match search', async () => {
+    render(<LeftPanel selectedMonitorId={null} onAddClick={vi.fn()} />, { wrapper })
+    await waitFor(() => screen.getByText('Test API'))
+
+    const searchInput = screen.getByPlaceholderText('Search monitors…')
+    fireEvent.change(searchInput, { target: { value: 'xyz-not-found' } })
+
+    await waitFor(() => {
+      expect(screen.getByText('No monitors found')).toBeInTheDocument()
+    })
+  })
 })
