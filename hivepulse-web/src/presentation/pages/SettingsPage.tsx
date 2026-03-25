@@ -153,6 +153,7 @@ function NotificationsTab() {
         </Typography>
       )}
       <ChannelModal
+        key={editChannel?.id ?? 'new'}
         open={modalOpen}
         onClose={() => { setModalOpen(false); setEditChannel(null) }}
         onSubmit={handleSubmit}
