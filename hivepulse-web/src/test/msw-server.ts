@@ -2,5 +2,13 @@ import { setupServer } from 'msw/node'
 import { monitorHandlers } from './handlers/monitors'
 import { userHandlers } from './handlers/users'
 import { notificationHandlers } from './handlers/notifications'
+import { tagHandlers } from './handlers/tags'
+import { statusPageHandlers } from './handlers/statusPages'
 
-export const server = setupServer(...monitorHandlers, ...userHandlers, ...notificationHandlers)
+export const server = setupServer(
+  ...monitorHandlers,
+  ...userHandlers,
+  ...notificationHandlers,
+  ...tagHandlers,
+  ...statusPageHandlers,
+)
