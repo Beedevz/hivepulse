@@ -26,7 +26,7 @@ func NewNotificationUsecase(
 func (u *NotificationUsecase) Notify(ctx context.Context, monitorID string, event domain.NotificationEvent) {
 	channels, err := u.repo.GetChannelsForMonitor(ctx, monitorID)
 	if err != nil {
-		log.Printf("notification: GetChannelsForMonitor failed for %s: %v", monitorID, err)
+		log.Printf("notification: GetChannelsForMonitor failed for %q: %v", monitorID, err)
 		return
 	}
 	for _, ch := range channels {
@@ -42,7 +42,7 @@ func (u *NotificationUsecase) notifyChannel(ctx context.Context, monitorID, chan
 	}
 	monitor, err := u.monitors.FindByID(ctx, monitorID)
 	if err != nil {
-		log.Printf("notification: FindByID %s failed: %v", monitorID, err)
+		log.Printf("notification: FindByID %q failed: %v", monitorID, err)
 		return
 	}
 
