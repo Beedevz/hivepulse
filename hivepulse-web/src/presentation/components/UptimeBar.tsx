@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material/styles'
 import { colors } from '../../shared/colors'
 
-type BlockStatus = 'up' | 'down' | 'unknown'
+export type BlockStatus = 'up' | 'down' | 'unknown'
 
 interface UptimeBarProps {
   blocks: BlockStatus[]
