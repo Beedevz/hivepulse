@@ -80,6 +80,24 @@ func main() {
 	aggregator := infra.NewAggregator(db)
 	go aggregator.Start(ctx)
 
+	notifRepo := repo.NewNotificationRepo(db)
+	dispatcher := service.NewNotificationDispatcher(
+		service.NewEmailSender(cfg),
+		service.NewWebhookSender(),
+		service.NewSlackSender(),
+	)
+	notifUC := usecase.NewNotificationUsecase(notifRepo, dispatcher, monitorRepo)
+	checkerUC.SetNotifier(notifUC)
+	aggregator.SetReminder(notifUC)
+
+	sslChecker := infra.NewSSLChecker(monitorRepo, notifUC, notifRepo)
+	go sslChecker.Start(ctx)
+
+	notifHandler := handler.NewNotificationHandler(notifUC)
+
+	handler.LoadSMTPFromDB(db, cfg)
+	settingsHandler := handler.NewSettingsHandler(db, cfg)
+
 	monitorUC := usecase.NewMonitorUsecase(monitorRepo, scheduler)
 	monitorHandler := handler.NewMonitorHandler(monitorUC, heartbeatRepo, statsUC)
 
@@ -120,6 +138,23 @@ func main() {
 		monitors.POST("", editorGuard, monitorHandler.Create)
 		monitors.PUT("/:id", editorGuard, monitorHandler.Update)
 		monitors.DELETE("/:id", editorGuard, monitorHandler.Delete)
+		monitors.GET("/:id/channels", adminGuard, notifHandler.ListMonitorChannels)
+		monitors.POST("/:id/channels/:chID", adminGuard, notifHandler.AssignChannel)
+		monitors.DELETE("/:id/channels/:chID", adminGuard, notifHandler.UnassignChannel)
+
+		notifs := v1.Group("/notification-channels")
+		notifs.Use(jwtAuth, adminGuard)
+		notifs.GET("", notifHandler.List)
+		notifs.POST("", notifHandler.Create)
+		notifs.PUT("/:id", notifHandler.Update)
+		notifs.DELETE("/:id", notifHandler.Delete)
+		notifs.GET("/:id/logs", notifHandler.Logs)
+		notifs.POST("/:id/test", notifHandler.TestChannel)
+
+		settings := v1.Group("/settings")
+		settings.Use(jwtAuth, adminGuard)
+		settings.GET("/smtp", settingsHandler.GetSMTP)
+		settings.PUT("/smtp", settingsHandler.PutSMTP)
 
 		incidents := v1.Group("/incidents")
 		incidents.Use(jwtAuth)
