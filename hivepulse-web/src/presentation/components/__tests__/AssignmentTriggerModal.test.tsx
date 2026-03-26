@@ -27,6 +27,7 @@ const assignment: MonitorChannelAssignment = {
 
 describe('AssignmentTriggerModal', () => {
   it('renders channel name in header', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useUpdateAssignmentTriggers).mockReturnValue({ mutate: vi.fn(), isPending: false } as any)
     render(
       <AssignmentTriggerModal assignment={assignment} monitorId="m1" open onClose={vi.fn()} />,
@@ -36,6 +37,7 @@ describe('AssignmentTriggerModal', () => {
   })
 
   it('renders cooldown input', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useUpdateAssignmentTriggers).mockReturnValue({ mutate: vi.fn(), isPending: false } as any)
     render(
       <AssignmentTriggerModal assignment={assignment} monitorId="m1" open onClose={vi.fn()} />,
@@ -45,6 +47,7 @@ describe('AssignmentTriggerModal', () => {
   })
 
   it('shows schedule fields when Custom is selected', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useUpdateAssignmentTriggers).mockReturnValue({ mutate: vi.fn(), isPending: false } as any)
     render(
       <AssignmentTriggerModal assignment={assignment} monitorId="m1" open onClose={vi.fn()} />,
@@ -56,6 +59,7 @@ describe('AssignmentTriggerModal', () => {
   })
 
   it('shows timezone from settings', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useUpdateAssignmentTriggers).mockReturnValue({ mutate: vi.fn(), isPending: false } as any)
     render(
       <AssignmentTriggerModal assignment={assignment} monitorId="m1" open onClose={vi.fn()} />,
@@ -67,6 +71,7 @@ describe('AssignmentTriggerModal', () => {
 
   it('calls mutation on Save', async () => {
     const mutate = vi.fn()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useUpdateAssignmentTriggers).mockReturnValue({ mutate, isPending: false } as any)
     render(
       <AssignmentTriggerModal assignment={assignment} monitorId="m1" open onClose={vi.fn()} />,

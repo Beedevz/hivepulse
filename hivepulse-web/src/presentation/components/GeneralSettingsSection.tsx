@@ -17,6 +17,7 @@ export function GeneralSettingsSection() {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (settings) setTimezone(settings.timezone)
   }, [settings])
 

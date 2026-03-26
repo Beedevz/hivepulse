@@ -10,7 +10,7 @@ vi.mock('../../../application/useSettings', () => ({
   useSaveGeneralSettings: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
 }))
 
-import { useGeneralSettings, useSaveGeneralSettings } from '../../../application/useSettings'
+import { useSaveGeneralSettings } from '../../../application/useSettings'
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -28,6 +28,7 @@ describe('GeneralSettingsSection', () => {
 
   it('calls save mutation on Save button click', async () => {
     const mutate = vi.fn()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(useSaveGeneralSettings).mockReturnValue({ mutate, isPending: false } as any)
     render(<GeneralSettingsSection />, { wrapper })
     fireEvent.click(screen.getByRole('button', { name: /save/i }))
