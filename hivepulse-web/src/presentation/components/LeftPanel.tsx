@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 import { colors } from '../../shared/colors'
 import { useMonitors } from '../../application/useMonitors'
 import { useTags, useMonitorTagsMap } from '../../application/useTags'
@@ -51,7 +53,7 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
   return (
     <Box
       sx={{
-        width: 380,
+        width: 480,
         flexShrink: 0,
         borderRight: '1px solid',
         borderColor: 'divider',
@@ -107,52 +109,31 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
         </Button>
       </Box>
 
-      {/* Search */}
-      <Box sx={{ px: 1.5, py: 1, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
-        <MonitorSearch onSearch={setSearchTerm} />
-      </Box>
-
-      {/* Tag filters */}
-      {tags.length > 0 && (
-        <Box
-          sx={{
-            px: 1.5,
-            py: 0.875,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            flexShrink: 0,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 0.5,
-          }}
-        >
-          {tags.map((tag) => {
-            const active = activeTagId === tag.id
-            return (
-              <Box
-                key={tag.id}
-                onClick={() => setActiveTagId(active ? null : tag.id)}
-                sx={{
-                  px: 0.875,
-                  py: 0.25,
-                  borderRadius: 0.5,
-                  fontSize: '0.5625rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.03em',
-                  cursor: 'pointer',
-                  lineHeight: 1.6,
-                  bgcolor: active ? tag.color : `${tag.color}22`,
-                  color: active ? '#fff' : tag.color,
-                  transition: 'all 0.15s',
-                  '&:hover': { bgcolor: active ? tag.color : `${tag.color}44` },
-                }}
-              >
-                {tag.name}
-              </Box>
-            )
-          })}
+      {/* Search + Tag filter */}
+      <Box sx={{ px: 1.5, py: 1, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0, display: 'flex', gap: 1 }}>
+        <Box sx={{ flex: 1 }}>
+          <MonitorSearch onSearch={setSearchTerm} />
         </Box>
-      )}
+        {tags.length > 0 && (
+          <Select
+            value={activeTagId ?? ''}
+            onChange={(e) => setActiveTagId(e.target.value || null)}
+            size="small"
+            displayEmpty
+            sx={{ fontSize: '0.75rem', minWidth: 120 }}
+          >
+            <MenuItem value=""><em>All tags</em></MenuItem>
+            {tags.map((tag) => (
+              <MenuItem key={tag.id} value={tag.id}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: tag.color, flexShrink: 0 }} />
+                  {tag.name}
+                </Box>
+              </MenuItem>
+            ))}
+          </Select>
+        )}
+      </Box>
 
       {/* Monitor list */}
       <Box sx={{ flex: 1, overflowY: 'auto', p: 1.25, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
