@@ -42,7 +42,7 @@ jobs:
             git switch --orphan gh-pages
             git commit --allow-empty -m "chore: initialize gh-pages for Helm chart repo"
             git push origin gh-pages
-            git switch -
+            git checkout $GITHUB_SHA
             git stash pop
           fi
 
