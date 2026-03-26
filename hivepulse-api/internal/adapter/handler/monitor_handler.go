@@ -55,6 +55,7 @@ type monitorResponse struct {
 	Method          string  `json:"method,omitempty"`
 	ExpectedStatus  int     `json:"expected_status,omitempty"`
 	FollowRedirects bool    `json:"follow_redirects,omitempty"`
+	SkipTLSVerify   bool    `json:"skip_tls_verify,omitempty"`
 	Host            string  `json:"host,omitempty"`
 	Port            int     `json:"port,omitempty"`
 	PingHost        string  `json:"ping_host,omitempty"`
@@ -83,7 +84,7 @@ func toMonitorResponse(m *domain.Monitor, lastStatus string, uptime24h float64) 
 	return monitorResponse{
 		ID: m.ID, Name: m.Name, CheckType: string(m.CheckType),
 		Interval: m.Interval, Timeout: m.Timeout, Retries: m.Retries, RetryInterval: m.RetryInterval, Enabled: m.Enabled,
-		URL: m.URL, Method: m.Method, ExpectedStatus: m.ExpectedStatus, FollowRedirects: m.FollowRedirects,
+		URL: m.URL, Method: m.Method, ExpectedStatus: m.ExpectedStatus, FollowRedirects: m.FollowRedirects, SkipTLSVerify: m.SkipTLSVerify,
 		Host: m.Host, Port: m.Port,
 		PingHost: m.PingHost, PacketCount: m.PacketCount,
 		DNSHost: m.DNSHost, RecordType: m.RecordType, DNSServer: m.DNSServer,
