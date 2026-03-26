@@ -342,18 +342,6 @@ func toDomainChannel(m *notificationChannelModel) (*domain.NotificationChannel, 
 	}, nil
 }
 
-func toChannelSlice(rows []notificationChannelModel) ([]*domain.NotificationChannel, error) {
-	result := make([]*domain.NotificationChannel, len(rows))
-	for i := range rows {
-		ch, err := toDomainChannel(&rows[i])
-		if err != nil {
-			return nil, err
-		}
-		result[i] = ch
-	}
-	return result, nil
-}
-
 func isNotFound(err error) bool {
 	return err == gorm.ErrRecordNotFound
 }
