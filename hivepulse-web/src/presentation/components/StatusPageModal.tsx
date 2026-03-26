@@ -77,8 +77,10 @@ export function StatusPageModal({ open, onClose, existing }: Readonly<Props>) {
             onChange={(e) => { setSlug(e.target.value); setSlugEdited(true) }}
             fullWidth size="small"
             inputProps={{ 'aria-label': 'slug' }}
-            helperText={<a href={`${BASE_URL}/s/${slug}`} target="_blank" rel="noreferrer">Preview</a>}
           />
+          <Typography fontSize="0.75rem" sx={{ mt: 0.5 }}>
+            <a href={`${BASE_URL}/s/${encodeURIComponent(slug)}`} target="_blank" rel="noreferrer">Preview</a>
+          </Typography>
         </Box>
         <TextField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} fullWidth size="small" multiline rows={2} />
         <TextField label="Logo URL" value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} fullWidth size="small" placeholder="https://..." />
