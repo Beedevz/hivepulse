@@ -1,4 +1,3 @@
-// hivepulse-web/src/presentation/components/GeneralSettingsSection.tsx
 import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -7,6 +6,7 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Snackbar from '@mui/material/Snackbar'
 import { useGeneralSettings, useSaveGeneralSettings } from '../../application/useSettings'
+import { useFontStore, fontPairMeta, type FontPair } from '../../shared/fontStore'
 
 const TIMEZONES = Intl.supportedValuesOf('timeZone')
 
@@ -15,6 +15,8 @@ export function GeneralSettingsSection() {
   const save = useSaveGeneralSettings()
   const [timezone, setTimezone] = useState('')
   const [saved, setSaved] = useState(false)
+
+  const { fontPair, setFontPair } = useFontStore()
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -31,8 +33,9 @@ export function GeneralSettingsSection() {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 480 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 480 }}>
       <Typography variant="subtitle1" fontWeight={600}>General</Typography>
+
       <Box>
         <Typography fontSize="0.75rem" color="text.secondary" mb={0.5}>Timezone</Typography>
         <Select
@@ -47,11 +50,35 @@ export function GeneralSettingsSection() {
           ))}
         </Select>
       </Box>
+
+      <Box>
+        <Typography fontSize="0.75rem" color="text.secondary" mb={0.5}>Font</Typography>
+        <Select
+          value={fontPair}
+          onChange={(e) => setFontPair(e.target.value as FontPair)}
+          size="small"
+          fullWidth
+          inputProps={{ 'aria-label': 'font' }}
+        >
+          {(Object.keys(fontPairMeta) as FontPair[]).map((key) => (
+            <MenuItem key={key} value={key}>
+              <Box>
+                <Typography fontSize="0.875rem">{fontPairMeta[key].label}</Typography>
+                <Typography fontSize="0.7rem" color="text.secondary" sx={{ fontFamily: fontPairMeta[key].body }}>
+                  Aa Bb 123 — {fontPairMeta[key].body.replace(/"/g, '')}
+                </Typography>
+              </Box>
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+
       <Box>
         <Button variant="contained" size="small" onClick={handleSave} disabled={save.isPending}>
           Save
         </Button>
       </Box>
+
       <Snackbar open={saved} message="Settings saved" autoHideDuration={3000} onClose={() => setSaved(false)} />
     </Box>
   )
