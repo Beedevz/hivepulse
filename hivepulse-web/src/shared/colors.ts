@@ -21,10 +21,10 @@ export const colors = {
 
   // ── Dark surfaces (warm purple-navy) ─────────────────────────────────────
   darkBg:          '#202232',              // TH.bg
-  darkPaper:       '#1e2134',              // TH.sf solid approx (rgba 30,33,52)
+  darkPaper:       'rgba(30,33,52,0.75)',   // TH.sf — semi-transparent for glass effect
   darkSidebar:     '#161626',              // TH.sb solid approx (rgba 22,24,38)
   darkHeader:      '#1c1e2e',              // TH.hd solid approx (rgba 28,30,46)
-  darkBorder:      'rgba(140,145,180,0.08)', // TH.bs
+  darkBorder:      'rgba(140,145,180,0.12)', // TH.bs
   darkBorderHover: 'rgba(245,166,35,0.22)', // TH.bh
   darkInput:       'rgba(35,38,58,0.8)',   // TH.ip
   darkSurface2:    'rgba(35,38,60,0.6)',   // TH.sa (alt surface)
