@@ -24,20 +24,18 @@ export function StatusPagesPage() {
         <Typography variant="h6" fontWeight={700} fontFamily="'Bricolage Grotesque', sans-serif">
           Status Pages
         </Typography>
-        <Button variant="contained" size="small" onClick={openCreate} sx={{ bgcolor: '#F5A623', color: '#202232', fontWeight: 700, '&:hover': { bgcolor: '#d4891f' } }}>
+        <Button variant="contained" size="small" onClick={openCreate} sx={{ fontWeight: 700 }}>
           + New Page
         </Button>
       </Box>
 
-      {isPending ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}><CircularProgress /></Box>
-      ) : pages.length === 0 ? (
+      {isPending && <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}><CircularProgress /></Box>}
+      {!isPending && pages.length === 0 && (
         <Typography color="text.secondary" textAlign="center" sx={{ pt: 4 }}>
           No status pages yet. Create one to get started.
         </Typography>
-      ) : (
-        pages.map((sp) => <StatusPageCard key={sp.id} statusPage={sp} onEdit={openEdit} />)
       )}
+      {!isPending && pages.length > 0 && pages.map((sp) => <StatusPageCard key={sp.id} statusPage={sp} onEdit={openEdit} />)}
 
       <StatusPageModal
         key={editing?.id ?? `new-${modalOpen}`}

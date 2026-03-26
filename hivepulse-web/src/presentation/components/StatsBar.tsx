@@ -67,7 +67,7 @@ export function StatsBar() {
   const incidentCount = incidents.length
 
   return (
-    <Box sx={{ display: 'flex', borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
+    <Box sx={{ display: 'flex', borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0, bgcolor: 'background.paper', backdropFilter: 'blur(8px)' }}>
       <MetricCell
         label="Avg Uptime"
         value={avgUptime}

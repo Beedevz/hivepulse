@@ -135,7 +135,14 @@ func (u *StatusPageUsecase) Delete(ctx context.Context, id string) error {
 }
 
 func (u *StatusPageUsecase) List(ctx context.Context, page, limit int) ([]*domain.StatusPage, int64, error) {
-	return u.repo.List(ctx, page, limit)
+	pages, total, err := u.repo.List(ctx, page, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	for _, sp := range pages {
+		sp.TagIDs, _ = u.repo.GetTagIDs(ctx, sp.ID)
+	}
+	return pages, total, nil
 }
 
 func (u *StatusPageUsecase) GetByID(ctx context.Context, id string) (*domain.StatusPage, error) {

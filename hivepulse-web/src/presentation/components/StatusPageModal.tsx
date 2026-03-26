@@ -12,7 +12,7 @@ import { useTags } from '../../application/useTags'
 import { useCreateStatusPage, useUpdateStatusPage } from '../../application/useStatusPages'
 import type { StatusPage, CreateStatusPageInput } from '../../domain/statusPage'
 
-const BASE_URL = import.meta.env.VITE_APP_URL ?? 'http://localhost:5173'
+const BASE_URL = globalThis.window === undefined ? '' : globalThis.window.location.origin
 
 function slugify(title: string): string {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')

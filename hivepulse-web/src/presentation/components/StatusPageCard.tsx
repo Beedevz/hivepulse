@@ -11,7 +11,7 @@ interface Props {
   onEdit: (sp: StatusPage) => void
 }
 
-const BASE_URL = import.meta.env.VITE_APP_URL ?? 'http://localhost:5173'
+const BASE_URL = globalThis.window === undefined ? '' : globalThis.window.location.origin
 
 export function StatusPageCard({ statusPage, onEdit }: Readonly<Props>) {
   const del = useDeleteStatusPage()

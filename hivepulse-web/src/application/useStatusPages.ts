@@ -1,9 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
 import { apiClient } from '../infrastructure/apiClient'
 import type { StatusPage, PublicStatusPageData, CreateStatusPageInput } from '../domain/statusPage'
-
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 
 export const useStatusPages = (page = 1, limit = 20) =>
   useQuery<{ data: StatusPage[]; total: number; page: number; limit: number }>({
@@ -22,7 +19,7 @@ export const useStatusPage = (id: string) =>
 export const usePublicStatusPage = (slug: string) =>
   useQuery<PublicStatusPageData>({
     queryKey: ['public-status-page', slug],
-    queryFn: () => axios.get(`${BASE_URL}/s/${slug}`).then((r) => r.data),
+    queryFn: () => apiClient.get(`/status-pages/public/${slug}`).then((r) => r.data),
     enabled: !!slug,
     retry: false,
   })

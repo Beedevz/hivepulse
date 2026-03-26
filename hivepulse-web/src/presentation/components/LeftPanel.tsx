@@ -47,7 +47,8 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
         flexShrink: 0,
         borderRight: '1px solid',
         borderColor: 'divider',
-        bgcolor: colors.leftPanelBg,
+        bgcolor: 'background.paper',
+        backdropFilter: 'blur(8px)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -89,7 +90,7 @@ export function LeftPanel({ selectedMonitorId, onAddClick }: Readonly<LeftPanelP
             py: 0.375,
             minWidth: 0,
             bgcolor: colors.accentDark,
-            color: '#202232',
+            color: 'background.default',
             borderRadius: 0.5,
             '&:hover': { bgcolor: colors.accentGlow },
           }}

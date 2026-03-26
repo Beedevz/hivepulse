@@ -8,13 +8,62 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Chip from '@mui/material/Chip'
 import type { CreateMonitorPayload, CheckType } from '../../domain/monitor'
+import { useTags, useMonitorTags, useAssignTag, useUnassignTag } from '../../application/useTags'
 
 interface MonitorModalProps {
   open: boolean
   onClose: () => void
   onSubmit: (payload: CreateMonitorPayload) => void
-  initialValues?: Partial<CreateMonitorPayload>
+  initialValues?: Partial<CreateMonitorPayload> & { id?: string }
+}
+
+function TagSection({ monitorId }: Readonly<{ monitorId: string }>) {
+  const { data: assigned = [] } = useMonitorTags(monitorId)
+  const { data: allTags = [] } = useTags()
+  const assignTag = useAssignTag()
+  const unassignTag = useUnassignTag()
+
+  const assignedIds = new Set(assigned.map((t) => t.id))
+  const unassigned = allTags.filter((t) => !assignedIds.has(t.id))
+
+  return (
+    <Box sx={{ mt: 2 }}>
+      <Typography fontSize="0.75rem" color="text.secondary" sx={{ mb: 1 }}>
+        Tags
+      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: unassigned.length > 0 ? 1 : 0 }}>
+        {assigned.map((t) => (
+          <Chip
+            key={t.id}
+            label={t.name}
+            size="small"
+            onDelete={() => unassignTag.mutate({ monitorId, tagId: t.id })}
+            sx={{ bgcolor: `${t.color}22`, color: t.color, fontSize: '0.6875rem' }}
+          />
+        ))}
+        {assigned.length === 0 && (
+          <Typography fontSize="0.6875rem" color="text.disabled">No tags assigned</Typography>
+        )}
+      </Box>
+      {unassigned.length > 0 && (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+          {unassigned.map((t) => (
+            <Chip
+              key={t.id}
+              label={`+ ${t.name}`}
+              size="small"
+              onClick={() => assignTag.mutate({ monitorId, tagId: t.id })}
+              sx={{ bgcolor: 'rgba(255,255,255,0.04)', border: '1px solid', borderColor: 'divider', color: 'text.secondary', fontSize: '0.6875rem', cursor: 'pointer' }}
+            />
+          ))}
+        </Box>
+      )}
+    </Box>
+  )
 }
 
 export const MonitorModal = ({ open, onClose, onSubmit, initialValues }: Readonly<MonitorModalProps>) => {
@@ -186,6 +235,8 @@ export const MonitorModal = ({ open, onClose, onSubmit, initialValues }: Readonl
             label="Enabled"
             sx={{ mt: 1, '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
           />
+
+          {initialValues?.id && <TagSection monitorId={initialValues.id} />}
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2.5 }}>

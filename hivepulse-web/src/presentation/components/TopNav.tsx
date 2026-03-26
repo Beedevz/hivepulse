@@ -4,11 +4,13 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import IconButton from '@mui/material/IconButton'
 import { useTheme } from '@mui/material/styles'
 import { colors } from '../../shared/colors'
 import { HivePulseLogo } from './Logo'
 import { useMe, useLogout } from '../../application/useAuth'
 import { useMonitors } from '../../application/useMonitors'
+import { useThemeMode } from '../../shared/themeStore'
 
 export function TopNav() {
   const theme = useTheme()
@@ -22,6 +24,7 @@ export function TopNav() {
   const downCount = monitors.filter((m) => m.last_status === 'down').length
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
+  const { mode, toggle } = useThemeMode()
   const userInitial = (me?.email ?? '?')[0].toUpperCase()
 
   return (
@@ -117,6 +120,16 @@ export function TopNav() {
             </>
           )}
         </Box>
+
+        {/* Theme toggle */}
+        <IconButton
+          size="small"
+          onClick={toggle}
+          aria-label="Toggle theme"
+          sx={{ color: 'text.secondary', fontSize: '1rem', width: 28, height: 28 }}
+        >
+          {mode === 'dark' ? '☀' : '☾'}
+        </IconButton>
 
         {/* Avatar */}
         <Box

@@ -59,7 +59,7 @@ const cssBaselineOverrides = {
 
 export const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'dark' as const,
     primary:  { main: colors.accentDark, dark: '#d4900e', light: colors.accentGlow },
     error:    { main: colors.down },
     success:  { main: colors.up },
@@ -95,6 +95,14 @@ export const darkTheme = createTheme({
           minHeight: '100vh',
           backgroundRepeat: 'repeat',
           backgroundAttachment: 'fixed',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(8px)',
+          backgroundImage: 'none',
         },
       },
     },

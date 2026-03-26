@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import type { StatsBucket, StatsRange } from '../../domain/stats'
 
@@ -16,6 +17,7 @@ function formatTime(iso: string, range: StatsRange): string {
 }
 
 export function ResponseTimeChart({ buckets, range }: Readonly<Props>) {
+  const theme = useTheme()
   if (!buckets || buckets.length === 0) {
     return <Typography>No data</Typography>
   }
@@ -28,13 +30,13 @@ export function ResponseTimeChart({ buckets, range }: Readonly<Props>) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+        <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
         <XAxis dataKey="time" tick={{ fontSize: 11 }} />
         <YAxis unit=" ms" tick={{ fontSize: 11 }} width={52} />
         <Tooltip
-          contentStyle={{ background: '#1e2235', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, fontSize: 12 }}
-          labelStyle={{ color: '#9ca3af' }}
-          itemStyle={{ color: '#e2e8f0' }}
+          contentStyle={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, borderRadius: 6, fontSize: 12 }}
+          labelStyle={{ color: theme.palette.text.secondary }}
+          itemStyle={{ color: theme.palette.text.primary }}
         />
         <Line type="monotone" dataKey="avg_ping_ms" stroke="#F5A623" strokeWidth={1.5} dot={false} activeDot={{ r: 4 }} />
       </LineChart>

@@ -238,7 +238,7 @@ export function MonitorDetailSection({ monitorId, onEdit, onDelete }: Readonly<M
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'auto' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 4, py: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 4, py: 2.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', backdropFilter: 'blur(8px)', flexShrink: 0 }}>
         <Typography variant="h6" fontWeight={600} color="text.primary" fontSize="1.0625rem">
           {monitor.name}
         </Typography>

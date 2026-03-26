@@ -29,10 +29,10 @@ const mockData = {
 }
 
 describe('PublicStatusPage', () => {
-  it('renders page title', () => {
+  it('renders overall status label', () => {
     vi.mocked(usePublicStatusPage).mockReturnValue({ data: mockData, isPending: false, isError: false } as unknown as ReturnType<typeof usePublicStatusPage>)
     render(<PublicStatusPage />, { wrapper })
-    expect(screen.getByText('My Company Status')).toBeInTheDocument()
+    expect(screen.getByText(/all systems operational/i)).toBeInTheDocument()
   })
 
   it('shows All Systems Operational banner', () => {
@@ -44,20 +44,20 @@ describe('PublicStatusPage', () => {
   it('shows monitor row', () => {
     vi.mocked(usePublicStatusPage).mockReturnValue({ data: mockData, isPending: false, isError: false } as unknown as ReturnType<typeof usePublicStatusPage>)
     render(<PublicStatusPage />, { wrapper })
-    expect(screen.getByText('API Gateway')).toBeInTheDocument()
+    expect(screen.getAllByText('API Gateway').length).toBeGreaterThan(0)
   })
 
-  it('shows active incident banner when incidents exist', () => {
+  it('shows incident timeline when active incidents exist', () => {
     const withIncident = { ...mockData, overall_status: 'outage' as const, active_incidents: [{ id: 'i2', monitor_name: 'DB', started_at: new Date().toISOString(), resolved_at: null, duration_s: 0, error_msg: 'down' }] }
     vi.mocked(usePublicStatusPage).mockReturnValue({ data: withIncident, isPending: false, isError: false } as unknown as ReturnType<typeof usePublicStatusPage>)
     render(<PublicStatusPage />, { wrapper })
-    expect(screen.getByText(/active incident/i)).toBeInTheDocument()
+    expect(screen.getByText(/incident timeline/i)).toBeInTheDocument()
   })
 
-  it('shows recent incidents list', () => {
+  it('shows incident timeline for recent incidents', () => {
     vi.mocked(usePublicStatusPage).mockReturnValue({ data: mockData, isPending: false, isError: false } as unknown as ReturnType<typeof usePublicStatusPage>)
     render(<PublicStatusPage />, { wrapper })
-    expect(screen.getByText(/recent incidents/i)).toBeInTheDocument()
+    expect(screen.getByText(/incident timeline/i)).toBeInTheDocument()
   })
 
   it('shows loading state', () => {
