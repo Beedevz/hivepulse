@@ -31,7 +31,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('ResponseTimeChart', () => {
   it('renders No data when buckets is empty', () => {
-    render(<ResponseTimeChart buckets={[]} range="24h" />, { wrapper })
+    render(<ResponseTimeChart buckets={[]} downPeriods={[]} range="24h" onRangeChange={vi.fn()} />, { wrapper })
     expect(screen.getByText('No data')).toBeTruthy()
   })
 
@@ -40,7 +40,7 @@ describe('ResponseTimeChart', () => {
       { time: '2026-03-24T00:00:00Z', up_count: 10, total_count: 10, avg_ping_ms: 45 },
       { time: '2026-03-24T01:00:00Z', up_count: 10, total_count: 10, avg_ping_ms: 60 },
     ]
-    render(<ResponseTimeChart buckets={buckets} range="24h" />, { wrapper })
+    render(<ResponseTimeChart buckets={buckets} downPeriods={[]} range="24h" onRangeChange={vi.fn()} />, { wrapper })
     expect(screen.getByTestId('responsive-container')).toBeTruthy()
     expect(screen.getByTestId('line-chart')).toBeTruthy()
   })
