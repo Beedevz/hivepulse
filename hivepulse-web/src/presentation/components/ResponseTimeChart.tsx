@@ -85,7 +85,7 @@ export function ResponseTimeChart({ buckets, downPeriods, range, onRangeChange }
                 key={i}
                 x1={new Date(dp.started_at).getTime()}
                 x2={dp.resolved_at ? new Date(dp.resolved_at).getTime() : Date.now()}
-                fill="rgba(248,113,113,0.15)"
+                fill="rgba(248,113,113,0.35)"
                 strokeOpacity={0}
               />
             ))}

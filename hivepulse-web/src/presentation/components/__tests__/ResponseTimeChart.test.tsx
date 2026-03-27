@@ -102,7 +102,7 @@ describe('ResponseTimeChart', () => {
         </QueryClientProvider>
       </ThemeProvider>
     )
-    const redRects = container.querySelectorAll('[fill="rgba(248,113,113,0.15)"]')
+    const redRects = container.querySelectorAll('[fill="rgba(248,113,113,0.35)"]')
     expect(redRects.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -122,7 +122,7 @@ describe('ResponseTimeChart', () => {
         </QueryClientProvider>
       </ThemeProvider>
     )
-    const redRects = container.querySelectorAll('[fill="rgba(248,113,113,0.15)"]')
+    const redRects = container.querySelectorAll('[fill="rgba(248,113,113,0.35)"]')
     expect(redRects.length).toBeGreaterThanOrEqual(1)
   })
 })
