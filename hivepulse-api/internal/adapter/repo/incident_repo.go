@@ -46,14 +46,36 @@ func (r *IncidentRepo) Resolve(ctx context.Context, monitorID string, resolvedAt
 }
 
 func (r *IncidentRepo) FindActive(ctx context.Context) ([]*domain.Incident, error) {
-	var models []incidentModel
+	type activeRow struct {
+		ID          int64      `gorm:"column:id"`
+		MonitorID   string     `gorm:"column:monitor_id"`
+		CurrentName string     `gorm:"column:current_name"`
+		StartedAt   time.Time  `gorm:"column:started_at"`
+		ResolvedAt  *time.Time `gorm:"column:resolved_at"`
+		ErrorMsg    string     `gorm:"column:error_msg"`
+	}
+	var rows []activeRow
 	if err := r.db.WithContext(ctx).
-		Where("resolved_at IS NULL").
-		Order("started_at DESC").
-		Find(&models).Error; err != nil {
+		Table("incidents i").
+		Select("i.id, i.monitor_id, COALESCE(m.name, i.monitor_name) AS current_name, i.started_at, i.resolved_at, i.error_msg").
+		Joins("LEFT JOIN monitors m ON m.id = i.monitor_id").
+		Where("i.resolved_at IS NULL").
+		Order("i.started_at DESC").
+		Scan(&rows).Error; err != nil {
 		return nil, err
 	}
-	return toIncidentSlice(models), nil
+	result := make([]*domain.Incident, len(rows))
+	for i, row := range rows {
+		result[i] = &domain.Incident{
+			ID:          row.ID,
+			MonitorID:   row.MonitorID,
+			MonitorName: row.CurrentName,
+			StartedAt:   row.StartedAt,
+			ResolvedAt:  row.ResolvedAt,
+			ErrorMsg:    row.ErrorMsg,
+		}
+	}
+	return result, nil
 }
 
 func (r *IncidentRepo) FindRecent(ctx context.Context, limit int) ([]*domain.Incident, error) {

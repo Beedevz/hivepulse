@@ -1,9 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom'
 import { ThemeProvider } from '../../../shared/ThemeProvider'
 import { MonitorsPage } from '../MonitorsPage'
+import type { DashboardOutletContext } from '../../components/DashboardLayout'
+
+function ContextShell() {
+  const ctx: DashboardOutletContext = { onEdit: vi.fn(), onDelete: vi.fn() }
+  return <Outlet context={ctx} />
+}
 
 vi.mock('react-router-dom', async (orig) => {
   const actual = await orig<typeof import('react-router-dom')>()
@@ -20,8 +26,10 @@ function renderAt(path: string) {
       <MemoryRouter initialEntries={[path]}>
         <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
           <Routes>
-            <Route path="/dashboard" element={<MonitorsPage />} />
-            <Route path="/monitors/:id" element={<MonitorsPage />} />
+            <Route element={<ContextShell />}>
+              <Route path="/monitor" element={<MonitorsPage />} />
+              <Route path="/monitor/:id" element={<MonitorsPage />} />
+            </Route>
           </Routes>
         </QueryClientProvider>
       </MemoryRouter>
@@ -30,18 +38,13 @@ function renderAt(path: string) {
 }
 
 describe('MonitorsPage', () => {
-  it('renders LeftPanel monitor list', async () => {
-    renderAt('/dashboard')
-    await waitFor(() => expect(screen.getByText('Test API')).toBeInTheDocument())
-  })
-
   it('shows empty state when no monitor selected', () => {
-    renderAt('/dashboard')
+    renderAt('/monitor')
     expect(screen.getByText(/select a monitor/i)).toBeInTheDocument()
   })
 
   it('renders MonitorDetailSection when :id present', async () => {
-    renderAt('/monitors/monitor-1')
+    renderAt('/monitor/monitor-1')
     // MonitorDetailSection shows Edit/Delete buttons for admin users
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument()

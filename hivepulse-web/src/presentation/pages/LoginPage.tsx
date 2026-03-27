@@ -29,7 +29,7 @@ export const LoginPage = () => {
     setError('')
     try {
       await login.mutateAsync({ email, password })
-      navigate('/dashboard')
+      navigate('/monitor')
     } catch {
       setError('Invalid email or password')
     }
