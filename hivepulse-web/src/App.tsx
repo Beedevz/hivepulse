@@ -35,8 +35,8 @@ export default function App() {
       <Route path="/s/:slug" element={<PublicStatusPage />} />
       <Route element={<PrivateRoute><AppLayout /></PrivateRoute>}>
         <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<MonitorsPage />} />
-          <Route path="/monitors/:id" element={<MonitorsPage />} />
+          <Route path="/monitor" element={<MonitorsPage />} />
+          <Route path="/monitor/:id" element={<MonitorsPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/status-pages" element={<StatusPagesPage />} />
           <Route path="/settings" element={<SettingsPage />} />

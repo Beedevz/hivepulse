@@ -60,7 +60,7 @@ export function TopNav() {
       {/* Nav links */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         {[
-          { to: '/dashboard',     label: 'Monitors' },
+          { to: '/monitor',     label: 'Monitors' },
           { to: '/alerts',        label: 'Alerts' },
           { to: '/status-pages',  label: 'Status' },
         ].map(({ to, label }) => (

@@ -47,7 +47,7 @@ export const MonitorListItem = forwardRef<HTMLDivElement, MonitorListItemProps>(
     return (
       <Box
         ref={ref}
-        onClick={() => navigate(`/monitors/${monitor.id}`)}
+        onClick={() => navigate(`/monitor/${monitor.id}`)}
         sx={{
           borderRadius: 1,
           border: '1px solid',

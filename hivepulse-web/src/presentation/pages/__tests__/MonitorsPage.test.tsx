@@ -27,8 +27,8 @@ function renderAt(path: string) {
         <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
           <Routes>
             <Route element={<ContextShell />}>
-              <Route path="/dashboard" element={<MonitorsPage />} />
-              <Route path="/monitors/:id" element={<MonitorsPage />} />
+              <Route path="/monitor" element={<MonitorsPage />} />
+              <Route path="/monitor/:id" element={<MonitorsPage />} />
             </Route>
           </Routes>
         </QueryClientProvider>
@@ -39,12 +39,12 @@ function renderAt(path: string) {
 
 describe('MonitorsPage', () => {
   it('shows empty state when no monitor selected', () => {
-    renderAt('/dashboard')
+    renderAt('/monitor')
     expect(screen.getByText(/select a monitor/i)).toBeInTheDocument()
   })
 
   it('renders MonitorDetailSection when :id present', async () => {
-    renderAt('/monitors/monitor-1')
+    renderAt('/monitor/monitor-1')
     // MonitorDetailSection shows Edit/Delete buttons for admin users
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument()

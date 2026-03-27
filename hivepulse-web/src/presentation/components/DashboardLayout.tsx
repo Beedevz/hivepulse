@@ -35,7 +35,7 @@ export function DashboardLayout() {
 
   const handleDelete = (id: string) => {
     deleteMonitor.mutate(id, {
-      onSuccess: () => navigate('/dashboard'),
+      onSuccess: () => { navigate('/monitor') },
     })
   }
 

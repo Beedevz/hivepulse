@@ -54,6 +54,6 @@ describe('MonitorListItem', () => {
   it('calls navigate to /monitors/:id on click', () => {
     render(<MonitorListItem monitor={baseMonitor} isSelected={false} />, { wrapper })
     fireEvent.click(screen.getByText('Test API'))
-    expect(mockNavigate).toHaveBeenCalledWith('/monitors/monitor-1')
+    expect(mockNavigate).toHaveBeenCalledWith('/monitor/monitor-1')
   })
 })
