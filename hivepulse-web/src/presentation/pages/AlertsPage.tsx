@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
@@ -143,34 +143,36 @@ export function AlertsPage() {
   const [q, setQ] = useState('')
   const [debouncedQ, setDebouncedQ] = useState('')
   const [activePage, setActivePage] = useState(1)
-  const [activeItems, setActiveItems] = useState<Incident[]>([])
   const [resolvedPage, setResolvedPage] = useState(1)
 
-  // Debounce search input (300ms)
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedQ(q), 300)
-    return () => clearTimeout(t)
-  }, [q])
-
-  // Reset pages when search query changes
-  useEffect(() => {
-    setActivePage(1)
-    setResolvedPage(1)
-    setActiveItems([])
-  }, [debouncedQ])
+  // Debounce search input (300ms) — resets pages inline to avoid setState-in-effect
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const handleSearchChange = useCallback((value: string) => {
+    setQ(value)
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedQ(value)
+      setActivePage(1)
+      setResolvedPage(1)
+    }, 300)
+  }, [])
 
   const { data: activeData, isLoading: loadingActive } = useIncidents('active', debouncedQ, activePage)
   const { data: resolvedData, isLoading: loadingResolved } = useIncidents('resolved', debouncedQ, resolvedPage)
 
-  // Accumulate active items (Load More pattern)
-  useEffect(() => {
-    if (!activeData) return
+  // Accumulate active items across Load More pages (setState-during-render pattern)
+  const [activeItems, setActiveItems] = useState<Incident[]>([])
+  const [prevActiveKey, setPrevActiveKey] = useState('')
+  const activeKey = `${debouncedQ}:${activePage}:${activeData?.total}`
+  if (activeKey !== prevActiveKey && activeData) {
+    setPrevActiveKey(activeKey)
+    const newItems = activeData.data ?? []
     if (activePage === 1) {
-      setActiveItems(activeData.data ?? [])
+      setActiveItems(newItems)
     } else {
-      setActiveItems((prev) => [...prev, ...(activeData.data ?? [])])
+      setActiveItems((prev) => [...prev, ...newItems])
     }
-  }, [activeData, activePage])
+  }
 
   const resolvedIncidents = resolvedData?.data ?? []
   const resolvedTotal = resolvedData?.total ?? 0
@@ -204,7 +206,7 @@ export function AlertsPage() {
               size="small"
               placeholder="Search monitors…"
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               slotProps={{
                 input: {
                   startAdornment: (
