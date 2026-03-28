@@ -24,7 +24,7 @@ func (incidentModel) TableName() string { return "incidents" }
 const (
 	incidentTable     = "incidents i"
 	incidentJoin      = "LEFT JOIN monitors m ON m.id = i.monitor_id"
-	incidentQFilter   = "? = '' OR COALESCE(m.name, i.monitor_name) ILIKE CONCAT('%', ?, '%')"
+	incidentQFilter   = "COALESCE(m.name, i.monitor_name) ILIKE CONCAT('%', ?, '%')"
 	incidentSelect    = "i.id, i.monitor_id, COALESCE(m.name, i.monitor_name) AS current_name, i.started_at, i.resolved_at, i.error_msg"
 	incidentOrderDesc = "i.started_at DESC"
 )
@@ -53,6 +53,14 @@ func mapIncidentRows(rows []incidentRow) []*domain.Incident {
 	return result
 }
 
+func incidentBaseQuery(db *gorm.DB, q string) *gorm.DB {
+	tx := db.Table(incidentTable).Joins(incidentJoin)
+	if q != "" {
+		tx = tx.Where(incidentQFilter, q)
+	}
+	return tx
+}
+
 type IncidentRepo struct{ db *gorm.DB }
 
 func NewIncidentRepo(db *gorm.DB) port.IncidentRepository { return &IncidentRepo{db} }
@@ -78,11 +86,8 @@ func (r *IncidentRepo) Resolve(ctx context.Context, monitorID string, resolvedAt
 }
 
 func (r *IncidentRepo) FindActive(ctx context.Context, q string, offset, limit int) ([]*domain.Incident, int, error) {
-	base := r.db.WithContext(ctx).
-		Table(incidentTable).
-		Joins(incidentJoin).
-		Where("i.resolved_at IS NULL").
-		Where(incidentQFilter, q, q)
+	base := incidentBaseQuery(r.db.WithContext(ctx), q).
+		Where("i.resolved_at IS NULL")
 
 	var total int64
 	if err := base.Count(&total).Error; err != nil {
@@ -102,10 +107,7 @@ func (r *IncidentRepo) FindActive(ctx context.Context, q string, offset, limit i
 }
 
 func (r *IncidentRepo) FindRecent(ctx context.Context, q string, offset, limit int) ([]*domain.Incident, int, error) {
-	base := r.db.WithContext(ctx).
-		Table(incidentTable).
-		Joins(incidentJoin).
-		Where(incidentQFilter, q, q)
+	base := incidentBaseQuery(r.db.WithContext(ctx), q)
 
 	var total int64
 	if err := base.Count(&total).Error; err != nil {
@@ -125,11 +127,8 @@ func (r *IncidentRepo) FindRecent(ctx context.Context, q string, offset, limit i
 }
 
 func (r *IncidentRepo) FindResolved(ctx context.Context, q string, offset, limit int) ([]*domain.Incident, int, error) {
-	base := r.db.WithContext(ctx).
-		Table(incidentTable).
-		Joins(incidentJoin).
-		Where("i.resolved_at IS NOT NULL").
-		Where(incidentQFilter, q, q)
+	base := incidentBaseQuery(r.db.WithContext(ctx), q).
+		Where("i.resolved_at IS NOT NULL")
 
 	var total int64
 	if err := base.Count(&total).Error; err != nil {

@@ -70,7 +70,7 @@ describe('MonitorListItem', () => {
       port: 5432,
     }
     render(<MonitorListItem monitor={tcpMonitor} isSelected={false} />, { wrapper })
-    expect(screen.getByText(/db\.acme\.com:5432/)).toBeInTheDocument()
+    expect(screen.getByText('db.acme.com:5432', { exact: false })).toBeInTheDocument()
     expect(screen.getByText('TCP')).toBeInTheDocument()
   })
 
@@ -83,7 +83,7 @@ describe('MonitorListItem', () => {
       interval: 60,
     }
     render(<MonitorListItem monitor={pingMonitor} isSelected={false} />, { wrapper })
-    expect(screen.getByText(/10\.0\.0\.5 · 4x · 60s/)).toBeInTheDocument()
+    expect(screen.getByText('10.0.0.5 · 4x · 60s', { exact: false })).toBeInTheDocument()
     expect(screen.getByText('PING')).toBeInTheDocument()
   })
 
@@ -96,7 +96,7 @@ describe('MonitorListItem', () => {
       interval: 60,
     }
     render(<MonitorListItem monitor={dnsMonitor} isSelected={false} />, { wrapper })
-    expect(screen.getByText(/cloudflare\.com · A · 60s/)).toBeInTheDocument()
+    expect(screen.getByText('cloudflare.com · A · 60s', { exact: false })).toBeInTheDocument()
     expect(screen.getByText('DNS')).toBeInTheDocument()
   })
 })
