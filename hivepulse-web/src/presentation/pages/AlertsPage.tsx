@@ -146,7 +146,7 @@ export function AlertsPage() {
   const [resolvedPage, setResolvedPage] = useState(1)
 
   // Debounce search input (300ms) — resets pages inline to avoid setState-in-effect
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const handleSearchChange = useCallback((value: string) => {
     setQ(value)
     clearTimeout(debounceRef.current)
