@@ -46,6 +46,36 @@ func (_m *StatsRepository) GetDaily(ctx context.Context, monitorID string, since
 	return r0, r1
 }
 
+// GetGlobalHourly provides a mock function with given fields: ctx, since
+func (_m *StatsRepository) GetGlobalHourly(ctx context.Context, since time.Time) ([]*domain.StatsBucket, error) {
+	ret := _m.Called(ctx, since)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetGlobalHourly")
+	}
+
+	var r0 []*domain.StatsBucket
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, time.Time) ([]*domain.StatsBucket, error)); ok {
+		return rf(ctx, since)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, time.Time) []*domain.StatsBucket); ok {
+		r0 = rf(ctx, since)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.StatsBucket)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, time.Time) error); ok {
+		r1 = rf(ctx, since)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetHourly provides a mock function with given fields: ctx, monitorID, since
 func (_m *StatsRepository) GetHourly(ctx context.Context, monitorID string, since time.Time) ([]*domain.StatsBucket, error) {
 	ret := _m.Called(ctx, monitorID, since)

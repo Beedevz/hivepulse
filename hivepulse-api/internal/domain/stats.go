@@ -14,6 +14,11 @@ type DownPeriod struct {
 	ResolvedAt *time.Time `json:"resolved_at,omitempty"`
 }
 
+type OverviewStats struct {
+	AvgPingMS int            `json:"avg_ping_ms"`
+	Buckets   []*StatsBucket `json:"buckets"`
+}
+
 type StatsResponse struct {
 	UptimePct   float64        `json:"uptime_pct"`
 	AvgPingMS   int            `json:"avg_ping_ms"`

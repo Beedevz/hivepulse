@@ -96,3 +96,37 @@ func (r *StatsRepo) GetDaily(ctx context.Context, monitorID string, since time.T
 	}
 	return out, nil
 }
+
+func (r *StatsRepo) GetGlobalHourly(ctx context.Context, since time.Time) ([]*domain.StatsBucket, error) {
+	type row struct {
+		Hour       time.Time
+		UpCount    int
+		TotalCount int
+		AvgPingMS  int
+	}
+	var rows []row
+	err := r.db.WithContext(ctx).Raw(`
+		SELECT hour,
+		       SUM(up_count)::int AS up_count,
+		       SUM(total_count)::int AS total_count,
+		       CASE WHEN SUM(total_count) > 0
+		            THEN (SUM(avg_ping_ms::bigint * total_count) / SUM(total_count))::int
+		            ELSE 0 END AS avg_ping_ms
+		FROM stats_hourly
+		WHERE hour >= ?
+		GROUP BY hour
+		ORDER BY hour ASC`, since).Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	out := make([]*domain.StatsBucket, len(rows))
+	for i, rw := range rows {
+		out[i] = &domain.StatsBucket{
+			Time:       rw.Hour,
+			UpCount:    rw.UpCount,
+			TotalCount: rw.TotalCount,
+			AvgPingMS:  rw.AvgPingMS,
+		}
+	}
+	return out, nil
+}

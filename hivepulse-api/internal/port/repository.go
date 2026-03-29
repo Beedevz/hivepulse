@@ -64,4 +64,5 @@ type StatsRepository interface {
 	GetMinutely(ctx context.Context, monitorID string, since time.Time) ([]*domain.StatsBucket, error)
 	GetHourly(ctx context.Context, monitorID string, since time.Time) ([]*domain.StatsBucket, error)
 	GetDaily(ctx context.Context, monitorID string, since time.Time) ([]*domain.StatsBucket, error)
+	GetGlobalHourly(ctx context.Context, since time.Time) ([]*domain.StatsBucket, error)
 }

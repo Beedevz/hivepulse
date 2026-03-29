@@ -30,6 +30,7 @@ type HeartbeatService interface {
 // StatsService abstracts stats queries for testability.
 type StatsService interface {
 	GetStats(ctx context.Context, monitorID, rangeParam string) (*domain.StatsResponse, error)
+	GetOverview(ctx context.Context) (*domain.OverviewStats, error)
 }
 
 type MonitorHandler struct {
@@ -308,6 +309,22 @@ func (h *MonitorHandler) Stats(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+// Overview godoc
+// @Summary      Global stats overview
+// @Tags         stats
+// @Security     Bearer
+// @Produce      json
+// @Success      200 {object} domain.OverviewStats
+// @Router       /stats/overview [get]
+func (h *MonitorHandler) Overview(c *gin.Context) {
+	resp, err := h.stats.GetOverview(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 		return
 	}
 	c.JSON(http.StatusOK, resp)

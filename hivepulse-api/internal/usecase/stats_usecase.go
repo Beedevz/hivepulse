@@ -93,3 +93,23 @@ func (u *StatsUsecase) GetStats(ctx context.Context, monitorID, rangeParam strin
 		DownPeriods: downPeriods,
 	}, nil
 }
+
+func (u *StatsUsecase) GetOverview(ctx context.Context) (*domain.OverviewStats, error) {
+	buckets, err := u.statsRepo.GetGlobalHourly(ctx, time.Now().Add(-12*time.Hour))
+	if err != nil {
+		return nil, err
+	}
+	var sumWeighted, sumCount int
+	for _, b := range buckets {
+		sumWeighted += b.AvgPingMS * b.TotalCount
+		sumCount += b.TotalCount
+	}
+	avgPing := 0
+	if sumCount > 0 {
+		avgPing = sumWeighted / sumCount
+	}
+	return &domain.OverviewStats{
+		AvgPingMS: avgPing,
+		Buckets:   buckets,
+	}, nil
+}
