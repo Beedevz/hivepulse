@@ -214,7 +214,10 @@ func main() {
 	}
 
 	// Serve embedded frontend with SPA fallback
-	staticFS, _ := fs.Sub(web.DistFS, "dist")
+	staticFS, err := fs.Sub(web.DistFS, "dist")
+	if err != nil {
+		log.Fatalf("frontend embed misconfigured: %v", err)
+	}
 	r.NoRoute(serveFrontend(staticFS))
 
 	defer scheduler.Stop()
@@ -234,9 +237,13 @@ func serveFrontend(staticFS fs.FS) gin.HandlerFunc {
 		// Try to serve the exact file
 		f, err := staticFS.Open(path[1:]) // strip leading "/"
 		if err == nil {
+			info, statErr := f.Stat()
+			isDir := statErr == nil && info.IsDir()
 			f.Close()
-			fileServer.ServeHTTP(c.Writer, c.Request)
-			return
+			if !isDir {
+				fileServer.ServeHTTP(c.Writer, c.Request)
+				return
+			}
 		}
 
 		// SPA fallback: serve index.html for non-file routes
