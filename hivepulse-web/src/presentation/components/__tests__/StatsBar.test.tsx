@@ -7,6 +7,7 @@ import { ThemeProvider } from '../../../shared/ThemeProvider'
 import { StatsBar } from '../StatsBar'
 import { useMonitors } from '../../../application/useMonitors'
 import { useIncidents } from '../../../application/useIncidents'
+import { useOverviewStats } from '../../../application/useStats'
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -15,6 +16,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
 })
 vi.mock('../../../application/useMonitors')
 vi.mock('../../../application/useIncidents')
+vi.mock('../../../application/useStats')
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>
@@ -78,14 +80,43 @@ describe('StatsBar', () => {
       isError: false,
       error: null,
     } as unknown as ReturnType<typeof useIncidents>)
+    vi.mocked(useOverviewStats).mockReturnValue({
+      data: {
+        avg_ping_ms: 85,
+        buckets: [
+          { time: '2026-03-29T00:00:00Z', up_count: 10, total_count: 10, avg_ping_ms: 80 },
+          { time: '2026-03-29T01:00:00Z', up_count: 10, total_count: 10, avg_ping_ms: 90 },
+        ],
+      },
+      isPending: false,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useOverviewStats>)
   })
 
-  it('renders all 4 metric labels', () => {
+  it('renders all 5 metric labels', () => {
     render(<StatsBar />, { wrapper })
     expect(screen.getByText(/avg uptime/i)).toBeInTheDocument()
+    expect(screen.getByText(/avg response/i)).toBeInTheDocument()
     expect(screen.getByText(/monitors down/i)).toBeInTheDocument()
     expect(screen.getByText(/active incidents/i)).toBeInTheDocument()
     expect(screen.getByText(/total monitors/i)).toBeInTheDocument()
+  })
+
+  it('renders avg response value', () => {
+    render(<StatsBar />, { wrapper })
+    expect(screen.getByTestId('avg-response-value')).toHaveTextContent('85ms')
+  })
+
+  it('shows — for avg response when no data', () => {
+    vi.mocked(useOverviewStats).mockReturnValueOnce({
+      data: undefined,
+      isPending: false,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useOverviewStats>)
+    render(<StatsBar />, { wrapper })
+    expect(screen.getByTestId('avg-response-value')).toHaveTextContent('—')
   })
 
   it('shows total monitors count from API', () => {

@@ -56,4 +56,15 @@ export const monitorHandlers = [
       })),
     })
   }),
+  http.get('http://localhost:8080/api/v1/stats/overview', () =>
+    HttpResponse.json({
+      avg_ping_ms: 85,
+      buckets: Array.from({ length: 12 }, (_, i) => ({
+        time: new Date(Date.now() - (11 - i) * 3_600_000).toISOString(),
+        up_count: 10,
+        total_count: 10,
+        avg_ping_ms: 60 + i * 5,
+      })),
+    })
+  ),
 ]
