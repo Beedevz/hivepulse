@@ -61,6 +61,14 @@ func (m *mockStatsService) GetStats(ctx context.Context, monitorID, rangeParam s
 	return args.Get(0).(*domain.StatsResponse), args.Error(1)
 }
 
+func (m *mockStatsService) GetOverview(ctx context.Context) (*domain.OverviewStats, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.OverviewStats), args.Error(1)
+}
+
 func setupMonitorRouter(svc handler.MonitorService) *gin.Engine {
 	return setupMonitorRouterWithStats(svc, nil)
 }

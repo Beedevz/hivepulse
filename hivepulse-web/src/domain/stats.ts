@@ -18,3 +18,8 @@ export interface StatsResponse {
 }
 
 export type StatsRange = '1h' | '3h' | '6h' | '24h' | '48h' | '7d' | '15d' | '30d' | '90d'
+
+export interface OverviewStats {
+  avg_ping_ms: number
+  buckets: StatsBucket[]
+}

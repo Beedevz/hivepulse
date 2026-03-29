@@ -157,6 +157,10 @@ func main() {
 		monitors.DELETE("/:id/channels/:chID", adminGuard, notifHandler.UnassignChannel)
 		monitors.PUT("/:id/channels/:channelId/triggers", adminGuard, notifHandler.UpdateAssignmentTriggers)
 
+		stats := v1.Group("/stats")
+		stats.Use(jwtAuth)
+		stats.GET("/overview", monitorHandler.Overview)
+
 		notifs := v1.Group("/notification-channels")
 		notifs.Use(jwtAuth, adminGuard)
 		notifs.GET("", notifHandler.List)
