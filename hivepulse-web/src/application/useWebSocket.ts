@@ -23,7 +23,7 @@ export function useWebSocket() {
             ...prev,
             data: prev.data.map(m =>
               m.id === event.monitor_id
-                ? { ...m, last_status: event.status }
+                ? { ...m, last_status: event.status, last_ping_ms: event.ping_ms }
                 : m
             ),
           }

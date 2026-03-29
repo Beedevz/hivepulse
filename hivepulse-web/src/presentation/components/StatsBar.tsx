@@ -74,10 +74,16 @@ export function StatsBar() {
   const { data: monitorsData } = useMonitors(1, 1000)
   const { data: incidentsData } = useIncidents('active')
   const { data: overviewData } = useOverviewStats()
-  const avgResponse = overviewData ? `${overviewData.avg_ping_ms}ms` : '—'
-  const sparklineData = overviewData?.buckets.map((b) => b.avg_ping_ms) ?? []
 
   const monitors = monitorsData?.data ?? []
+
+  // Avg response: prefer WS-updated last_ping_ms from monitors cache, fallback to overview endpoint
+  const monitorsWithPing = monitors.filter((m) => m.last_ping_ms != null && m.last_ping_ms > 0)
+  const avgResponseMs = monitorsWithPing.length > 0
+    ? Math.round(monitorsWithPing.reduce((s, m) => s + m.last_ping_ms!, 0) / monitorsWithPing.length)
+    : overviewData?.avg_ping_ms ?? null
+  const avgResponse = avgResponseMs === null ? '—' : `${avgResponseMs}ms`
+  const sparklineData = overviewData?.buckets.map((b) => b.avg_ping_ms) ?? []
   const incidents = incidentsData?.data ?? []
 
   const avgUptime = monitors.length > 0

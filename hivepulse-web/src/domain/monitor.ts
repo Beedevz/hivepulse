@@ -26,6 +26,7 @@ export interface Monitor {
   expected_value?: string
   dns_server?: string
   last_status: MonitorStatus
+  last_ping_ms?: number
   uptime_24h: number
   created_at: string
 }
