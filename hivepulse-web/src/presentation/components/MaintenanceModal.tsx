@@ -5,6 +5,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useCreateMaintenance } from '../../application/useMaintenance'
 
 interface MaintenanceModalProps {
@@ -62,6 +63,9 @@ export function MaintenanceModal({ open, onClose, monitorId }: Readonly<Maintena
             size="small"
             placeholder="e.g. Server upgrade"
           />
+          <Typography fontSize="0.75rem" color="text.secondary">
+            Times are in your local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
