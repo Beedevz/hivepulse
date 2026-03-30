@@ -11,9 +11,10 @@ import type { Monitor } from '../../domain/monitor'
 
 function getStatusColor(status: string, isDark: boolean): string {
   const map: Record<string, [string, string]> = {
-    up:       [colors.up,   colors.upL],
-    down:     [colors.down, colors.downL],
-    unknown:  [colors.darkTextTertiary, colors.lightTextTertiary],
+    up:          [colors.up,   colors.upL],
+    down:        [colors.down, colors.downL],
+    maintenance: [colors.blue, colors.blueL],
+    unknown:     [colors.darkTextTertiary, colors.lightTextTertiary],
   }
   const pair = map[status] ?? [colors.darkTextTertiary, colors.lightTextTertiary]
   return isDark ? pair[0] : pair[1]

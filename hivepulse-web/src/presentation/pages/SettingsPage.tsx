@@ -18,6 +18,12 @@ import { ChannelModal } from '../components/ChannelModal'
 import { TagManager } from '../components/TagManager'
 import { GeneralSettingsSection } from '../components/GeneralSettingsSection'
 import type { NotificationChannel, CreateChannelInput } from '../../domain/notification'
+import { useGlobalMaintenance, useDeleteMaintenance } from '../../application/useMaintenance'
+import { MaintenanceModal } from '../components/MaintenanceModal'
+import BuildIcon from '@mui/icons-material/Build'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import IconButton from '@mui/material/IconButton'
+import Chip from '@mui/material/Chip'
 
 function SMTPForm() {
   const { data: smtp } = useSMTPSettings()
@@ -163,6 +169,46 @@ function NotificationsSection() {
   )
 }
 
+function GlobalMaintenanceSection() {
+  const { data } = useGlobalMaintenance()
+  const deleteMW = useDeleteMaintenance()
+  const [modalOpen, setModalOpen] = useState(false)
+  const windows = data?.data ?? []
+  const now = new Date()
+
+  return (
+    <Box sx={{ mt: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h6" fontWeight={600} fontSize="1rem">Global Maintenance</Typography>
+        <Button size="small" startIcon={<BuildIcon sx={{ fontSize: 14 }} />} onClick={() => setModalOpen(true)}>
+          Schedule
+        </Button>
+      </Box>
+      {windows.length === 0 && (
+        <Typography fontSize="0.875rem" color="text.secondary">No global maintenance windows.</Typography>
+      )}
+      {windows.map((w) => {
+        const isActive = new Date(w.starts_at) <= now && new Date(w.ends_at) > now
+        return (
+          <Box key={w.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box>
+              {isActive && <Chip label="ACTIVE" size="small" color="info" sx={{ mr: 1, height: 20, fontSize: '0.6875rem', fontWeight: 700 }} />}
+              <Typography component="span" fontSize="0.875rem" fontFamily="monospace">
+                {new Date(w.starts_at).toLocaleString()} → {new Date(w.ends_at).toLocaleString()}
+              </Typography>
+              {w.reason && <Typography fontSize="0.8125rem" color="text.secondary">{w.reason}</Typography>}
+            </Box>
+            <IconButton size="small" onClick={() => deleteMW.mutate(w.id)}>
+              <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Box>
+        )
+      })}
+      <MaintenanceModal open={modalOpen} onClose={() => setModalOpen(false)} />
+    </Box>
+  )
+}
+
 type SectionKey = 'general' | 'users' | 'notifications' | 'tags'
 
 export function SettingsPage() {
@@ -246,6 +292,10 @@ export function SettingsPage() {
 
           {section === 'tags' && me?.role === 'admin' && (
             <TagManager />
+          )}
+
+          {section === 'general' && me?.role === 'admin' && (
+            <GlobalMaintenanceSection />
           )}
         </Box>
       </Box>
