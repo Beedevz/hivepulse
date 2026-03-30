@@ -33,7 +33,7 @@ export function GeneralSettingsSection() {
   }
 
   return (
-    <Box sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 2.5, display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 480 }}>
+    <Box sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 2.5, display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Typography variant="subtitle1" fontWeight={600}>General</Typography>
 
       <Box>
