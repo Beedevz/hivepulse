@@ -177,9 +177,9 @@ function GlobalMaintenanceSection() {
   const now = new Date()
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 3, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 2.5 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6" fontWeight={600} fontSize="1rem">Global Maintenance</Typography>
+        <Typography variant="subtitle1" fontWeight={600}>Global Maintenance</Typography>
         <Button size="small" startIcon={<BuildIcon sx={{ fontSize: 14 }} />} onClick={() => setModalOpen(true)}>
           Schedule
         </Button>
