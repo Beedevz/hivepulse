@@ -13,6 +13,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"time"
 
 	_ "github.com/beedevz/hivepulse/docs"
 	"github.com/beedevz/hivepulse/web"
@@ -48,6 +49,20 @@ func main() {
 	heartbeatRepo := repo.NewHeartbeatRepo(db)
 	incidentRepo := repo.NewIncidentRepo(db)
 	maintenanceRepo := repo.NewMaintenanceWindowRepo(db)
+
+	// Cleanup expired maintenance windows daily (older than 30 days)
+	go func() {
+		ticker := time.NewTicker(24 * time.Hour)
+		defer ticker.Stop()
+		for range ticker.C {
+			before := time.Now().AddDate(0, -1, 0)
+			if n, err := maintenanceRepo.DeleteExpiredBefore(context.Background(), before); err != nil {
+				log.Printf("maintenance cleanup error: %v", err)
+			} else if n > 0 {
+				log.Printf("maintenance cleanup: deleted %d expired windows", n)
+			}
+		}
+	}()
 
 	hub := infra.NewHub()
 	go hub.Run()

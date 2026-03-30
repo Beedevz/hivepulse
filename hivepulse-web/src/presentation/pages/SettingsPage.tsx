@@ -204,6 +204,9 @@ function GlobalMaintenanceSection() {
           </Box>
         )
       })}
+      <Typography fontSize="0.75rem" color="text.secondary" sx={{ mt: 1.5 }}>
+        Expired maintenance windows are automatically cleaned up after 30 days.
+      </Typography>
       <MaintenanceModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </Box>
   )

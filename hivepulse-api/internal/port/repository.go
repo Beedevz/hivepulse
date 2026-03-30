@@ -66,3 +66,12 @@ type StatsRepository interface {
 	GetDaily(ctx context.Context, monitorID string, since time.Time) ([]*domain.StatsBucket, error)
 	GetGlobalHourly(ctx context.Context, since time.Time) ([]*domain.StatsBucket, error)
 }
+
+type MaintenanceWindowRepository interface {
+	Create(ctx context.Context, mw *domain.MaintenanceWindow) error
+	Delete(ctx context.Context, id string) error
+	FindByMonitor(ctx context.Context, monitorID string) ([]*domain.MaintenanceWindow, error)
+	FindGlobal(ctx context.Context) ([]*domain.MaintenanceWindow, error)
+	IsMonitorInMaintenance(ctx context.Context, monitorID string, at time.Time) (bool, error)
+	DeleteExpiredBefore(ctx context.Context, before time.Time) (int64, error)
+}
