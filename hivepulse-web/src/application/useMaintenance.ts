@@ -7,6 +7,7 @@ export function useMonitorMaintenance(monitorId: string) {
     queryKey: ['maintenance', monitorId],
     queryFn: () => apiClient.get(`/monitors/${monitorId}/maintenance`).then((r) => r.data),
     enabled: !!monitorId,
+    refetchInterval: 30_000,
   })
 }
 
@@ -14,6 +15,7 @@ export function useGlobalMaintenance() {
   return useQuery<{ data: MaintenanceWindow[] }>({
     queryKey: ['maintenance', 'global'],
     queryFn: () => apiClient.get('/maintenance-windows').then((r) => r.data),
+    refetchInterval: 30_000,
   })
 }
 
