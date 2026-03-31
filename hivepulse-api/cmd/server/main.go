@@ -13,6 +13,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"time"
 
 	_ "github.com/beedevz/hivepulse/docs"
 	"github.com/beedevz/hivepulse/web"
@@ -47,6 +48,21 @@ func main() {
 	monitorRepo := repo.NewMonitorRepo(db)
 	heartbeatRepo := repo.NewHeartbeatRepo(db)
 	incidentRepo := repo.NewIncidentRepo(db)
+	maintenanceRepo := repo.NewMaintenanceWindowRepo(db)
+
+	// Cleanup expired maintenance windows daily (older than 30 days)
+	go func() {
+		ticker := time.NewTicker(24 * time.Hour)
+		defer ticker.Stop()
+		for range ticker.C {
+			before := time.Now().AddDate(0, -1, 0)
+			if n, err := maintenanceRepo.DeleteExpiredBefore(context.Background(), before); err != nil {
+				log.Printf("maintenance cleanup error: %v", err)
+			} else if n > 0 {
+				log.Printf("maintenance cleanup: deleted %d expired windows", n)
+			}
+		}
+	}()
 
 	hub := infra.NewHub()
 	go hub.Run()
@@ -62,6 +78,7 @@ func main() {
 			domain.CheckDNS:  service.NewDNSChecker(),
 		},
 		hub,
+		maintenanceRepo,
 	)
 
 	scheduler := infra.NewScheduler(checkerUC)
@@ -109,6 +126,8 @@ func main() {
 
 	userUC := usecase.NewUserUsecase(userRepo)
 	userHandler := handler.NewUserHandler(userUC)
+
+	maintenanceHandler := handler.NewMaintenanceHandler(maintenanceRepo)
 
 	wsHandler := handler.NewWSHandler(hub)
 	incidentHandler := handler.NewIncidentHandler(incidentRepo)
@@ -158,10 +177,17 @@ func main() {
 		monitors.POST("/:id/channels/:chID", adminGuard, notifHandler.AssignChannel)
 		monitors.DELETE("/:id/channels/:chID", adminGuard, notifHandler.UnassignChannel)
 		monitors.PUT("/:id/channels/:channelId/triggers", adminGuard, notifHandler.UpdateAssignmentTriggers)
+		monitors.GET("/:id/maintenance", maintenanceHandler.ListByMonitor)
 
 		stats := v1.Group("/stats")
 		stats.Use(jwtAuth)
 		stats.GET("/overview", monitorHandler.Overview)
+
+		maint := v1.Group("/maintenance-windows")
+		maint.Use(jwtAuth, editorGuard)
+		maint.GET("", maintenanceHandler.ListGlobal)
+		maint.POST("", maintenanceHandler.Create)
+		maint.DELETE("/:id", maintenanceHandler.Delete)
 
 		notifs := v1.Group("/notification-channels")
 		notifs.Use(jwtAuth, adminGuard)

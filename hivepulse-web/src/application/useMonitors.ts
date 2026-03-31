@@ -7,7 +7,7 @@ export const useMonitors = (page = 1, limit = 20) =>
     queryKey: ['monitors', page, limit],
     queryFn: () =>
       apiClient.get(`/monitors?page=${page}&limit=${limit}`).then((r) => r.data),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
   })
 
 export const useHeartbeats = (monitorID: string) =>

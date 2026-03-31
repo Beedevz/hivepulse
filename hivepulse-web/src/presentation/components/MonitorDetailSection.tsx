@@ -13,6 +13,11 @@ import { useMonitor, useHeartbeats } from '../../application/useMonitors'
 import { useStats } from '../../application/useStats'
 import { useMe } from '../../application/useAuth'
 import { useMonitorChannels, useChannels, useAssignChannel, useUnassignChannel } from '../../application/useNotifications'
+import { useMonitorMaintenance, useDeleteMaintenance } from '../../application/useMaintenance'
+import { MaintenanceModal } from './MaintenanceModal'
+import BuildIcon from '@mui/icons-material/Build'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import IconButton from '@mui/material/IconButton'
 import { useMonitorTags, useTags, useAssignTag, useUnassignTag } from '../../application/useTags'
 import Popover from '@mui/material/Popover'
 import { UptimeHeatmap } from './UptimeHeatmap'
@@ -203,6 +208,51 @@ function MonitorChannelsSection({ monitorId }: Readonly<{ monitorId: string }>) 
           onClose={() => setTriggerTarget(null)}
         />
       )}
+    </Box>
+  )
+}
+
+function MonitorMaintenanceSection({ monitorId }: Readonly<{ monitorId: string }>) {
+  const { data } = useMonitorMaintenance(monitorId)
+  const deleteMW = useDeleteMaintenance()
+  const [modalOpen, setModalOpen] = useState(false)
+  const windows = data?.data ?? []
+  const now = new Date()
+
+  return (
+    <Box sx={{ mt: 2.5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 1.5, p: 2.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+        <Typography variant="subtitle1" fontWeight={600} color="text.primary">
+          Maintenance Windows
+        </Typography>
+        <Button size="small" startIcon={<BuildIcon sx={{ fontSize: 14 }} />} onClick={() => setModalOpen(true)}>
+          Schedule
+        </Button>
+      </Box>
+      {windows.length === 0 && (
+        <Typography fontSize="0.8125rem" color="text.secondary">No maintenance windows scheduled.</Typography>
+      )}
+      {windows.map((w) => {
+        const isActive = new Date(w.starts_at) <= now && new Date(w.ends_at) > now
+        return (
+          <Box key={w.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 0.75, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box>
+              {isActive && <Chip label="ACTIVE" size="small" color="info" sx={{ mr: 1, height: 20, fontSize: '0.6875rem', fontWeight: 700 }} />}
+              <Typography component="span" fontSize="0.8125rem" fontFamily="monospace">
+                {new Date(w.starts_at).toLocaleString()} → {new Date(w.ends_at).toLocaleString()}
+              </Typography>
+              {w.reason && <Typography fontSize="0.75rem" color="text.secondary">{w.reason}</Typography>}
+            </Box>
+            <IconButton size="small" onClick={() => deleteMW.mutate(w.id)}>
+              <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Box>
+        )
+      })}
+      <Typography fontSize="0.75rem" color="text.secondary" sx={{ mt: 1.5 }}>
+        Expired maintenance windows are automatically cleaned up after 30 days.
+      </Typography>
+      <MaintenanceModal open={modalOpen} onClose={() => setModalOpen(false)} monitorId={monitorId} />
     </Box>
   )
 }
@@ -424,6 +474,8 @@ export function MonitorDetailSection({ monitorId, onEdit, onDelete }: Readonly<M
         {me?.role === 'admin' && monitorId && (
           <MonitorChannelsSection monitorId={monitorId} />
         )}
+
+        {monitorId && <MonitorMaintenanceSection monitorId={monitorId} />}
       </Box>
     </Box>
   )

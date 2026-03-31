@@ -11,9 +11,10 @@ import type { Monitor } from '../../domain/monitor'
 
 function getStatusColor(status: string, isDark: boolean): string {
   const map: Record<string, [string, string]> = {
-    up:       [colors.up,   colors.upL],
-    down:     [colors.down, colors.downL],
-    unknown:  [colors.darkTextTertiary, colors.lightTextTertiary],
+    up:          [colors.up,   colors.upL],
+    down:        [colors.down, colors.downL],
+    maintenance: [colors.blue, colors.blueL],
+    unknown:     [colors.darkTextTertiary, colors.lightTextTertiary],
   }
   const pair = map[status] ?? [colors.darkTextTertiary, colors.lightTextTertiary]
   return isDark ? pair[0] : pair[1]
@@ -68,10 +69,14 @@ export const MonitorListItem = forwardRef<HTMLDivElement, MonitorListItemProps>(
             ? `${statusColor}40`
             : monitor.last_status === 'down'
             ? 'rgba(248,113,113,0.2)'
+            : monitor.last_status === 'maintenance'
+            ? 'rgba(107,163,247,0.2)'
             : 'divider',
           borderLeft: `2px solid ${statusColor}`,
           bgcolor: monitor.last_status === 'down'
             ? 'rgba(248,113,113,0.05)'
+            : monitor.last_status === 'maintenance'
+            ? 'rgba(107,163,247,0.05)'
             : isSelected
             ? `${statusColor}10`
             : 'background.paper',
@@ -95,9 +100,28 @@ export const MonitorListItem = forwardRef<HTMLDivElement, MonitorListItemProps>(
           <Typography fontSize="0.75rem" fontWeight={600} color="text.primary" noWrap sx={{ flex: 1 }}>
             {monitor.name}
           </Typography>
-          <Typography fontSize="0.6875rem" fontWeight={700} color={statusColor} sx={{ flexShrink: 0 }}>
-            {(monitor.uptime_24h * 100).toFixed(1)}%
-          </Typography>
+          {monitor.last_status === 'maintenance' ? (
+            <Box
+              component="span"
+              sx={{
+                fontSize: '0.5625rem',
+                fontWeight: 700,
+                px: '6px',
+                py: '1px',
+                borderRadius: '4px',
+                bgcolor: 'rgba(107,163,247,0.15)',
+                color: colors.blue,
+                flexShrink: 0,
+                letterSpacing: '0.04em',
+              }}
+            >
+              MAINTENANCE
+            </Box>
+          ) : (
+            <Typography fontSize="0.6875rem" fontWeight={700} color={statusColor} sx={{ flexShrink: 0 }}>
+              {(monitor.uptime_24h * 100).toFixed(1)}%
+            </Typography>
+          )}
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
