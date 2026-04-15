@@ -67,7 +67,7 @@ func TestIncidentHandler_List_Resolved(t *testing.T) {
 		Data  []map[string]interface{} `json:"data"`
 		Total int                      `json:"total"`
 	}
-	json.Unmarshal(w.Body.Bytes(), &body)
+	_ = json.Unmarshal(w.Body.Bytes(), &body)
 	assert.Equal(t, 1, body.Total)
 	assert.Equal(t, "API", body.Data[0]["monitor_name"])
 	repo.AssertExpectations(t)
@@ -110,7 +110,7 @@ func TestIncidentHandler_List_OffsetPagination(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 	var body struct{ Total int `json:"total"` }
-	json.Unmarshal(w.Body.Bytes(), &body)
+	_ = json.Unmarshal(w.Body.Bytes(), &body)
 	assert.Equal(t, 47, body.Total)
 	repo.AssertExpectations(t)
 }

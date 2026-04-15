@@ -71,7 +71,7 @@ func TestHTTPChecker_Down_Unreachable(t *testing.T) {
 func TestHTTPChecker_KeywordFound_Up(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok","version":"1.0"}`))
+		_, _ = w.Write([]byte(`{"status":"ok","version":"1.0"}`))
 	}))
 	defer srv.Close()
 
@@ -88,7 +88,7 @@ func TestHTTPChecker_KeywordFound_Up(t *testing.T) {
 func TestHTTPChecker_KeywordNotFound_Down(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"degraded"}`))
+		_, _ = w.Write([]byte(`{"status":"degraded"}`))
 	}))
 	defer srv.Close()
 
@@ -107,7 +107,7 @@ func TestHTTPChecker_KeywordNotFound_Down(t *testing.T) {
 func TestHTTPChecker_KeywordEmpty_SkipsBodyCheck(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`anything`))
+		_, _ = w.Write([]byte(`anything`))
 	}))
 	defer srv.Close()
 

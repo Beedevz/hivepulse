@@ -68,7 +68,7 @@ func TestSetupStatus_ReturnsTrue(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	var body map[string]bool
-	json.Unmarshal(w.Body.Bytes(), &body)
+	_ = json.Unmarshal(w.Body.Bytes(), &body)
 	assert.True(t, body["setup_required"])
 }
 
